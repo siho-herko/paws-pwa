@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192" width="192" height="192">
+  <!-- Background -->
+  <rect width="192" height="192" rx="32" fill="#1a3d2b"/>
+
+  <!-- Stylised tree / ancient woodland motif -->
+  <!-- Ground line -->
+  <rect x="20" y="148" width="152" height="6" rx="3" fill="#2d6a4f"/>
+
+  <!-- Main trunk -->
+  <rect x="88" y="100" width="16" height="52" rx="4" fill="#52b788"/>
+
+  <!-- Tree canopy  layered triangles -->
+  <polygon points="96,28 130,90 62,90" fill="#52b788" opacity="0.95"/>
+  <polygon points="96,48 124,100 68,100" fill="#2d6a4f"/>
+  <polygon points="96,62 118,105 74,105" fill="#1a3d2b" opacity="0.6"/>
+
+  <!-- NFCA gold accent  small circle badge bottom-right -->
+  <circle cx="152" cy="152" r="22" fill="#b5830a"/>
+  <text x="152" y="158" text-anchor="middle"
+        font-family="Georgia, serif" font-size="14" font-weight="700"
+        fill="#faf7f0">AW</text>
+</svg>

@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PAWS Business Case Modeller — NFCA</title>
+  <meta name="description" content="Calculate the financial case for restoring Plantations on Ancient Woodland Sites in Fife. Timber sales, grants, ESG funding and sweat equity modelled in one tool.">
+
+  <!-- PWA -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#1a3d2b">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="PAWS Modeller">
+  <link rel="apple-touch-icon" href="icons/icon-192.svg">
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="styles/main.css">
+</head>
+<body>
+
+  <!-- Loading overlay — hidden by app.js after DB is ready -->
+  <div id="loading-overlay" role="status" aria-live="polite">
+    <div class="loading-inner">
+      <div class="loading-icon">🌲</div>
+      <h2>Loading PAWS data…</h2>
+      <p>Scottish Forestry Grant Scheme 2024 constants</p>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════
+       HEADER
+  ═══════════════════════════════════════════ -->
+  <header class="site-header" role="banner">
+    <div class="header-main">
+      <div class="header-brand">
+        <img
+          src="icons/nfca-logo.svg"
+          alt="NFCA"
+          class="header-logo"
+          onerror="this.style.display='none'; this.nextElementSibling.style.display='inline';"
+        >
+        <span class="header-logo-fallback" style="display:none;">NFCA</span>
+        <div>
+          <div class="header-title">
+            PAWS Business Case Modeller
+            <span>North Fife Community Arborist</span>
+          </div>
+        </div>
+      </div>
+      <a href="https://fife-shieldbelt.netlify.app" class="header-back" target="_blank" rel="noopener">
+        ← ShieldBelt Summary
+      </a>
+    </div>
+    <div class="header-subtitle" aria-label="Programme context">
+      Fife Ancient Woodland &nbsp;·&nbsp; Scottish Forestry Grant Scheme &nbsp;·&nbsp; NatureScot AWI
+    </div>
+  </header>
+
+  <!-- Mobile: jump to results -->
+  <a href="#panel-results" class="mobile-anchor">See Results ↓</a>
+
+  <!-- ═══════════════════════════════════════════
+       APP WRAPPER
+  ═══════════════════════════════════════════ -->
+  <div class="app-wrapper">
+
+    <!-- ─────────────────────────────────────────
+         LEFT PANEL — CONTROLS
+    ───────────────────────────────────────── -->
+    <aside class="panel-controls" aria-label="Configuration controls">
+      <div class="panel-controls-inner">
+        <div class="panel-controls-header">
+          <h2>Configure Your Site</h2>
+          <p>Adjust inputs to model your specific woodland</p>
+        </div>
+
+        <!-- ── Section 1: Your Woodland ── -->
+        <div class="input-section open" id="section-woodland">
+          <div class="input-section-header" role="button" tabindex="0" aria-expanded="true" aria-controls="body-woodland">
+            <h3><span class="section-number">01</span> Your Woodland</h3>
+            <span class="section-chevron">▼</span>
+          </div>
+          <div class="input-section-body" id="body-woodland">
+
+            <div class="slider-row">
+              <label for="input-size">
+                Site size
+                <span class="slider-value mono" id="val-size">4.0 ha</span>
+              </label>
+              <input
+                type="range"
+                id="input-size"
+                min="0.5" max="20" step="0.5"
+                value="4"
+                aria-label="Site size in hectares"
+              >
+              <div class="slider-track-labels">
+                <span>0.5 ha</span>
+                <span>20 ha</span>
+              </div>
+            </div>
+
+            <div class="number-input-row">
+              <label for="input-size-num">Or type:</label>
+              <input
+                type="number"
+                id="input-size-num"
+                min="0.5" max="20" step="0.5"
+                value="4"
+                aria-label="Site size numeric input"
+              >
+              <span class="text-muted" style="font-size:0.8rem;">ha</span>
+            </div>
+
+            <div class="mt-12">
+              <label class="select-label" for="input-species">Conifer species</label>
+              <select id="input-species" aria-label="Select conifer species">
+                <option value="sitka_spruce">Sitka Spruce</option>
+                <option value="scots_pine">Scots Pine</option>
+                <option value="larch">Larch</option>
+                <option value="mixed_conifer">Mixed Conifer</option>
+              </select>
+              <div class="mt-8">
+                <span class="species-chip" id="species-chip">
+                  🌲 Sitka Spruce
+                </span>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- ── Section 2: Harvesting Conditions ── -->
+        <div class="input-section open" id="section-harvest">
+          <div class="input-section-header" role="button" tabindex="0" aria-expanded="true" aria-controls="body-harvest">
+            <h3><span class="section-number">02</span> Harvesting Conditions</h3>
+            <span class="section-chevron">▼</span>
+          </div>
+          <div class="input-section-body" id="body-harvest">
+
+            <div class="slider-row">
+              <label for="input-difficulty">
+                Access difficulty
+                <span class="slider-value mono" id="val-difficulty">2</span>
+              </label>
+              <input
+                type="range"
+                id="input-difficulty"
+                min="1" max="5" step="1"
+                value="2"
+                aria-label="Harvesting difficulty 1 to 5"
+              >
+              <div class="slider-track-labels">
+                <span>Easy</span>
+                <span>Severe</span>
+              </div>
+            </div>
+            <div class="mt-4">
+              <span class="difficulty-label moderate" id="difficulty-badge">Moderate — some slope</span>
+            </div>
+            <p class="helper-text mt-8">
+              This is the single biggest variable. Steep gorge sites can make timber a net loss.
+            </p>
+
+          </div>
+        </div>
+
+        <!-- ── Section 3: Deer Fencing ── -->
+        <div class="input-section open" id="section-fencing">
+          <div class="input-section-header" role="button" tabindex="0" aria-expanded="true" aria-controls="body-fencing">
+            <h3><span class="section-number">03</span> Deer Fencing</h3>
+            <span class="section-chevron">▼</span>
+          </div>
+          <div class="input-section-body" id="body-fencing">
+
+            <div class="slider-row" id="fencing-slider-row">
+              <label for="input-perimeter">
+                Perimeter length
+                <span class="slider-value mono" id="val-perimeter">400 m</span>
+              </label>
+              <input
+                type="range"
+                id="input-perimeter"
+                min="0" max="3000" step="50"
+                value="400"
+                aria-label="Deer fence perimeter in metres"
+              >
+              <div class="slider-track-labels">
+                <span>0 m</span>
+                <span>3,000 m</span>
+              </div>
+            </div>
+            <div class="auto-calc-text" id="perimeter-suggest">
+              Suggested: ≈ <span id="perimeter-auto">—</span> m &nbsp;(√(ha × 10,000) × 4 × 1.2)
+            </div>
+
+            <label class="checkbox-row mt-8" for="input-no-fence">
+              <input type="checkbox" id="input-no-fence" aria-label="No deer pressure — fencing not needed">
+              No deer pressure — fencing not needed
+            </label>
+
+          </div>
+        </div>
+
+        <!-- ── Section 4: Regeneration Strategy ── -->
+        <div class="input-section open" id="section-regen">
+          <div class="input-section-header" role="button" tabindex="0" aria-expanded="true" aria-controls="body-regen">
+            <h3><span class="section-number">04</span> Regeneration Strategy</h3>
+            <span class="section-chevron">▼</span>
+          </div>
+          <div class="input-section-body" id="body-regen">
+
+            <div class="slider-row">
+              <label for="input-regen">
+                Natural regeneration
+                <span class="slider-value mono" id="val-regen">40%</span>
+              </label>
+              <input
+                type="range"
+                id="input-regen"
+                min="0" max="100" step="5"
+                value="40"
+                aria-label="Percentage of site using natural regeneration"
+              >
+              <div class="slider-track-labels">
+                <span>0%</span>
+                <span>100%</span>
+              </div>
+            </div>
+            <div class="stat-chips mt-8">
+              <span class="stat-chip" id="regen-chip">40% natural regen</span>
+              <span class="stat-chip planting" id="planting-chip">60% active planting</span>
+            </div>
+            <p class="helper-text mt-8">
+              Natural regen costs nothing but takes 3–5 years longer. Higher on sites with adjacent ancient wood seed sources.
+            </p>
+
+          </div>
+        </div>
+
+        <!-- ── Section 5: Private Funding ── -->
+        <div class="input-section open" id="section-funding">
+          <div class="input-section-header" role="button" tabindex="0" aria-expanded="true" aria-controls="body-funding">
+            <h3><span class="section-number">05</span> Private Funding</h3>
+            <span class="section-chevron">▼</span>
+          </div>
+          <div class="input-section-body" id="body-funding">
+
+            <div class="slider-row">
+              <label for="input-esg">
+                ESG sponsorship rate
+                <span class="slider-value mono" id="val-esg">£750/ha</span>
+              </label>
+              <input
+                type="range"
+                id="input-esg"
+                min="0" max="2500" step="50"
+                value="750"
+                aria-label="ESG sponsorship rate per hectare"
+              >
+              <div class="slider-track-labels">
+                <span>£0</span>
+                <span>£2,500/ha</span>
+              </div>
+            </div>
+            <p class="helper-text mt-8">
+              Local distilleries, corporates, or land agents paying for Biodiversity Net Gain credits.
+            </p>
+
+          </div>
+        </div>
+
+        <!-- ── Section 6: Management ── -->
+        <div class="input-section open" id="section-mgmt">
+          <div class="input-section-header" role="button" tabindex="0" aria-expanded="true" aria-controls="body-mgmt">
+            <h3><span class="section-number">06</span> Management</h3>
+            <span class="section-chevron">▼</span>
+          </div>
+          <div class="input-section-body" id="body-mgmt">
+
+            <div class="toggle-row">
+              <span class="toggle-label active" id="label-diy">DIY</span>
+              <label class="toggle-switch" aria-label="Toggle between DIY and Hire Forestry Agent">
+                <input type="checkbox" id="input-agent">
+                <span class="toggle-track"></span>
+              </label>
+              <span class="toggle-label" id="label-agent">Hire Forestry Agent</span>
+            </div>
+
+            <div class="agent-fee-notice" id="agent-fee-notice" role="alert">
+              –12% management fee on gross inflow
+            </div>
+
+            <!-- Advanced Settings -->
+            <div class="advanced-accordion" id="advanced-accordion">
+              <div class="advanced-accordion-header" role="button" tabindex="0" aria-expanded="false" aria-controls="advanced-body">
+                <span>⚙ Advanced Settings — Override Defaults</span>
+                <span class="section-chevron">▼</span>
+              </div>
+              <div class="advanced-accordion-body" id="advanced-body">
+                <p class="helper-text" style="margin-bottom:14px;">
+                  Override calculation constants for site-specific estimates.
+                  Changes apply after a short pause. Leave blank to use defaults.
+                </p>
+
+                <div class="adv-section-label">Timber</div>
+                <div class="advanced-field">
+                  <label for="adv-yield">Timber yield (tons/ha)</label>
+                  <input type="number" class="adv-override" id="adv-yield"
+                         placeholder="350" min="50" max="600" step="10">
+                </div>
+                <div class="advanced-field">
+                  <label for="adv-sitka-price">Sitka Spruce price (£/ton)</label>
+                  <input type="number" class="adv-override" id="adv-sitka-price"
+                         placeholder="25" min="5" max="80" step="1">
+                </div>
+                <div class="advanced-field">
+                  <label for="adv-scots-price">Scots Pine / Larch price (£/ton)</label>
+                  <input type="number" class="adv-override" id="adv-scots-price"
+                         placeholder="35" min="5" max="100" step="1">
+                </div>
+
+                <div class="adv-section-label">FGS Grants</div>
+                <div class="advanced-field">
+                  <label for="adv-fencing-grant">Deer fencing grant (£/m)</label>
+                  <input type="number" class="adv-override" id="adv-fencing-grant"
+                         placeholder="9.90" min="0" max="20" step="0.10">
+                </div>
+                <div class="advanced-field">
+                  <label for="adv-restocking-grant">Restocking grant (£/ha)</label>
+                  <input type="number" class="adv-override" id="adv-restocking-grant"
+                         placeholder="2400" min="0" max="6000" step="100">
+                </div>
+
+                <div class="adv-section-label">Planting Costs</div>
+                <div class="advanced-field">
+                  <label for="adv-trees-per-ha">Trees per hectare</label>
+                  <input type="number" class="adv-override" id="adv-trees-per-ha"
+                         placeholder="2000" min="500" max="4000" step="100">
+                </div>
+                <div class="advanced-field">
+                  <label for="adv-tree-cost">Tree cost each (£)</label>
+                  <input type="number" class="adv-override" id="adv-tree-cost"
+                         placeholder="2.50" min="0.50" max="10" step="0.10">
+                </div>
+
+                <div class="adv-section-label">Management</div>
+                <div class="advanced-field">
+                  <label for="adv-agent-fee">Agent fee (%)</label>
+                  <input type="number" class="adv-override" id="adv-agent-fee"
+                         placeholder="12" min="0" max="25" step="1">
+                </div>
+
+                <button id="adv-reset-btn" class="reset-btn">
+                  ↺ Reset to Scottish Forestry defaults
+                </button>
+                <p class="helper-text" style="margin-top:10px;">
+                  Default values from Scottish Forestry Grant Scheme 2024. Override for site-specific estimates.
+                </p>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+      </div><!-- /panel-controls-inner -->
+    </aside>
+
+    <!-- ─────────────────────────────────────────
+         RIGHT PANEL — RESULTS
+    ───────────────────────────────────────── -->
+    <main class="panel-results" id="panel-results" aria-label="Calculation results">
+
+      <div class="results-header">
+        <h2>Your Financial Case</h2>
+        <p>Adjust the controls on the left to model your specific PAWS site.</p>
+      </div>
+
+      <!-- ══════════════════════════════════════
+           1. Net Cash Position (Year 1)
+      ══════════════════════════════════════ -->
+      <section id="result-net" aria-label="Net cash position">
+
+        <!-- Hero card -->
+        <div class="result-hero" id="result-hero-card">
+          <div class="hero-top-row">
+            <div class="result-hero-label">Net Year 1 Position</div>
+            <div class="scenario-tabs" role="group" aria-label="Scenario">
+              <button class="tab-btn active" id="tab-contractor" data-tab="contractor">Contractor</button>
+              <button class="tab-btn"        id="tab-diy"        data-tab="diy">DIY</button>
+            </div>
+          </div>
+          <div class="result-hero-number" id="hero-number" aria-live="polite">
+            <span class="result-hero-placeholder">Configure your woodland ←</span>
+          </div>
+          <div id="breakeven-badge-wrap" style="margin-top:10px;"></div>
+          <div class="result-hero-sub" id="hero-sub" style="margin-top:6px;opacity:.65;font-size:0.8rem;"></div>
+        </div>
+
+        <!-- Breakdown card -->
+        <div class="result-card" style="margin-top:-6px; border-top-left-radius:0; border-top-right-radius:0;">
+          <div class="result-card-header">
+            <span class="result-card-title">Income vs Cost Breakdown</span>
+            <span class="result-card-badge" id="net-badge">Year 1</span>
+          </div>
+          <div id="net-breakdown">
+            <div class="card-placeholder">
+              <span class="card-placeholder-arrow">←</span>
+              Configure your woodland to see breakdown
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ══════════════════════════════════════
+           2. Funding Mix
+      ══════════════════════════════════════ -->
+      <section id="result-funding" aria-label="Funding mix">
+        <div class="result-card">
+          <div class="result-card-header">
+            <span class="result-card-title">Funding Mix — How It's Paid For</span>
+            <span class="result-card-badge" id="funding-badge">Sources</span>
+          </div>
+
+          <div id="funding-placeholder">
+            <div class="card-placeholder">
+              <span class="card-placeholder-arrow">←</span>
+              Configure your woodland to see funding sources
+            </div>
+          </div>
+
+          <!-- HTML stacked bar -->
+          <div class="funding-bar" id="funding-bar" style="display:none;" aria-label="Funding source proportions">
+            <div class="funding-segment timber" id="seg-timber" style="width:0%"></div>
+            <div class="funding-segment grant"  id="seg-grant"  style="width:0%"></div>
+            <div class="funding-segment esg"    id="seg-esg"    style="width:0%"></div>
+          </div>
+
+          <!-- Detail rows: colour dot + label + value + % -->
+          <div id="funding-rows" style="display:none; margin-top:14px;"></div>
+
+          <!-- Canvas donut chart -->
+          <div id="funding-donut-wrap" style="display:none; margin-top:20px;">
+            <canvas id="chart-donut" style="display:block; margin:0 auto; max-width:180px; width:100%;"></canvas>
+          </div>
+        </div>
+      </section>
+
+      <!-- ══════════════════════════════════════
+           3. Sweat Equity Tracker
+      ══════════════════════════════════════ -->
+      <section id="result-sweat" aria-label="Sweat equity tracker">
+        <div class="result-card">
+          <div class="result-card-header">
+            <span class="result-card-title">Sweat Equity — What DIY Saves You</span>
+            <span class="result-card-badge">DIY vs Contractor</span>
+          </div>
+
+          <div id="sweat-placeholder">
+            <div class="card-placeholder">
+              <span class="card-placeholder-arrow">←</span>
+              Configure your woodland to compare DIY vs contractor costs
+            </div>
+          </div>
+
+          <!-- Comparison bar rows (populated by app.js) -->
+          <div id="sweat-compare" style="display:none;"></div>
+
+          <!-- Total saving summary -->
+          <div id="sweat-total" style="display:none;"></div>
+        </div>
+      </section>
+
+      <!-- ══════════════════════════════════════
+           4. 15-Year Asset Projection
+      ══════════════════════════════════════ -->
+      <section id="result-projection" aria-label="15-year asset projection">
+        <div class="result-card">
+          <div class="result-card-header">
+            <span class="result-card-title">15-Year Woodland Value Projection</span>
+            <span class="result-card-badge">Annual income once established</span>
+          </div>
+
+          <p class="helper-text" style="margin-bottom:12px;">
+            What your restored broadleaf woodland earns once the canopy establishes.
+            Hover over the chart for year-by-year detail.
+          </p>
+
+          <div id="projection-placeholder">
+            <div class="card-placeholder">
+              <span class="card-placeholder-arrow">←</span>
+              Configure your woodland to see 15-year projection
+            </div>
+          </div>
+
+          <!-- Canvas line chart -->
+          <div id="projection-chart-wrap" style="display:none;">
+            <canvas id="chart-projection" style="width:100%; display:block;"
+                    aria-label="15-year stacked area projection chart"></canvas>
+            <div id="legend-projection" style="margin-top:10px; display:flex; flex-wrap:wrap; gap:4px;"></div>
+          </div>
+
+          <!-- Stat boxes: Year 15 annual + cumulative -->
+          <div id="projection-stats" style="display:none;"></div>
+        </div>
+      </section>
+
+      <!-- Footnote -->
+      <div class="divider"></div>
+      <p style="font-size:0.75rem; color:var(--c-muted); line-height:1.6;">
+        Indicative modelling only. Timber values, grant rates and carbon prices subject to market conditions and eligibility.
+        Consult a registered forestry consultant before committing to a PAWS restoration programme.
+        Grant figures based on Scottish Forestry Grant Scheme (SFGS) 2024–25 indicative rates.
+      </p>
+
+    </main>
+  </div><!-- /app-wrapper -->
+
+  <!-- ═══════════════════════════════════════════
+       SCRIPTS
+  ═══════════════════════════════════════════ -->
+  <!-- ES modules — order handled by import statements in app.js -->
+  <script type="module" src="app.js"></script>
+
+</body>
+</html>

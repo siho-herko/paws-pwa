@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <!-- Background -->
+  <rect width="512" height="512" rx="80" fill="#1a3d2b"/>
+
+  <!-- Ground -->
+  <rect x="48" y="396" width="416" height="16" rx="8" fill="#2d6a4f"/>
+
+  <!-- Trunk -->
+  <rect x="232" y="268" width="48" height="138" rx="10" fill="#52b788"/>
+
+  <!-- Canopy layers -->
+  <polygon points="256,68 360,240 152,240" fill="#52b788"/>
+  <polygon points="256,120 340,268 172,268" fill="#2d6a4f"/>
+  <polygon points="256,168 318,280 194,280" fill="#1a3d2b" opacity="0.55"/>
+
+  <!-- Gold badge -->
+  <circle cx="400" cy="404" r="64" fill="#b5830a"/>
+  <text x="400" y="396" text-anchor="middle"
+        font-family="Georgia, serif" font-size="28" font-weight="700"
+        fill="#faf7f0">PAWS</text>
+  <text x="400" y="424" text-anchor="middle"
+        font-family="Georgia, serif" font-size="18" font-weight="400"
+        fill="#f4c542">NFCA</text>
+</svg>
