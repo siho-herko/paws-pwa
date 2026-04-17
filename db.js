@@ -14,11 +14,12 @@ function _openRaw() {
   return new Promise((resolve, reject) => {
     const req = indexedDB.open(DB_NAME, DB_VERSION);
 
+    // FIX [1b Firefox]: delete the store before recreating on version upgrade
+    // so schema changes don't leave stale object stores behind.
     req.onupgradeneeded = (event) => {
       const db = event.target.result;
-      if (!db.objectStoreNames.contains(STORE)) {
-        db.createObjectStore(STORE, { keyPath: 'id' });
-      }
+      if (db.objectStoreNames.contains(STORE)) db.deleteObjectStore(STORE);
+      db.createObjectStore(STORE, { keyPath: 'id' });
     };
 
     req.onsuccess  = (event) => resolve(event.target.result);

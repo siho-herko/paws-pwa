@@ -377,6 +377,15 @@
         <p>Adjust the controls on the left to model your specific PAWS site.</p>
       </div>
 
+      <!-- Sister tool contextual nudge — hectares value updated by app.js -->
+      <div class="sister-nudge" id="sister-nudge" style="display:none;" aria-live="polite">
+        Restoring this <strong id="nudge-hectares">—</strong> ha PAWS block?
+        Consider deploying ShieldBelt agroforestry margins alongside for additional income.
+        <a href="https://fife-shieldbelt-toolkit.siho.workers.dev" target="_blank" rel="noopener" class="sister-nudge-link">
+          Open ShieldBelt Calculator →
+        </a>
+      </div>
+
       <!-- ══════════════════════════════════════
            1. Net Cash Position (Year 1)
       ══════════════════════════════════════ -->
@@ -391,7 +400,7 @@
               <button class="tab-btn"        id="tab-diy"        data-tab="diy">DIY</button>
             </div>
           </div>
-          <div class="result-hero-number" id="hero-number" aria-live="polite">
+          <div class="result-hero-number" id="hero-number" aria-live="polite" aria-atomic="true">
             <span class="result-hero-placeholder">Configure your woodland ←</span>
           </div>
           <div id="breakeven-badge-wrap" style="margin-top:10px;"></div>
@@ -516,6 +525,22 @@
 
     </main>
   </div><!-- /app-wrapper -->
+
+  <!-- ═══════════════════════════════════════════
+       FOOTER
+  ═══════════════════════════════════════════ -->
+  <footer class="site-footer" role="contentinfo">
+    <div class="footer-inner">
+      <span class="footer-copy">PAWS Business Case Modeller &mdash; North Fife Community Arborist</span>
+      <a href="https://fife-shieldbelt-toolkit.siho.workers.dev"
+         class="footer-link"
+         target="_blank"
+         rel="noopener"
+         aria-label="Open ShieldBelt Calculator sister tool">
+        ShieldBelt Calculator →
+      </a>
+    </div>
+  </footer>
 
   <!-- ═══════════════════════════════════════════
        SCRIPTS

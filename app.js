@@ -153,21 +153,28 @@ function encodeURL(state) {
   history.replaceState(null, '', '?' + p.toString());
 }
 
+// FIX [3 malformed-URL]: valid species keys — anything else falls back to default
+const VALID_SPECIES = new Set(['sitka_spruce', 'scots_pine', 'larch', 'mixed_conifer']);
+
 function decodeURL() {
   const p = new URLSearchParams(window.location.search);
   if (!p.has('ha')) return null;
 
-  const pn = (k, d) => { const v = parseFloat(p.get(k)); return isNaN(v) ? d : v; };
-  const pi = (k, d) => { const v = parseInt(p.get(k), 10); return isNaN(v) ? d : v; };
-  const pN = (k)    => { const v = parseFloat(p.get(k)); return isNaN(v) ? null : v; };
+  const pn    = (k, d) => { const v = parseFloat(p.get(k)); return isNaN(v) ? d : v; };
+  const pi    = (k, d) => { const v = parseInt(p.get(k), 10); return isNaN(v) ? d : v; };
+  const pN    = (k)    => { const v = parseFloat(p.get(k)); return isNaN(v) ? null : v; };
+  const clamp = (v, lo, hi) => Math.min(Math.max(v, lo), hi);
+
+  const sp  = p.get('sp') || 'sitka_spruce';
 
   return {
-    hectares:          pn('ha',    4),
-    species:           p.get('sp') || 'sitka_spruce',
-    difficulty:        pi('diff',  2),
-    fencing_m:         pi('fence', 400),
-    natural_regen_pct: pi('regen', 40),
-    esg_per_ha:        pi('esg',   750),
+    // FIX [3 malformed-URL]: clamp all numeric params to valid ranges
+    hectares:          clamp(pn('ha',    4),   0.5, 20),
+    species:           VALID_SPECIES.has(sp) ? sp : 'sitka_spruce',
+    difficulty:        clamp(pi('diff',  2),   1,   5),
+    fencing_m:         clamp(pi('fence', 400), 0,   3000),
+    natural_regen_pct: clamp(pi('regen', 40),  0,   100),
+    esg_per_ha:        clamp(pi('esg',   750), 0,   2500),
     hire_agent:        p.get('agent') === '1',
     adv_yield:              pN('yield'),
     adv_fencing_grant:      pN('fg'),
@@ -276,6 +283,12 @@ function updateLiveLabels(s) {
   el('label-diy')?.classList.toggle('active', !s.hire_agent);
   el('label-agent')?.classList.toggle('active', s.hire_agent);
   el('agent-fee-notice')?.classList.toggle('visible', s.hire_agent);
+
+  // Sister tool nudge — show once a calculation is in progress, with live ha
+  const nudge   = el('sister-nudge');
+  const nudgeHa = el('nudge-hectares');
+  if (nudge)   nudge.style.display = 'block';
+  if (nudgeHa) nudgeHa.textContent = s.hectares.toFixed(1);
 }
 
 // ─────────────────────────────────────────────────
@@ -308,16 +321,25 @@ function renderHero(r, tab) {
 
   const heroEl = el('hero-number');
   if (heroEl) {
-    heroEl.innerHTML = `<span style="
-      font-family:'Playfair Display',Georgia,serif;
-      font-size:3rem;font-weight:900;line-height:1;color:${color};"
-    >${fmt(net)}</span>`;
+    // FIX [T3-B]: use createElement + textContent so the formatted currency value
+    // is never parsed as HTML — prevents any future injection via calculated strings.
+    heroEl.textContent = '';
+    const span = document.createElement('span');
+    span.style.cssText = `font-family:'Playfair Display',Georgia,serif;font-size:3rem;font-weight:900;line-height:1;color:${color};`;
+    span.textContent = fmt(net);
+    heroEl.appendChild(span);
   }
 
   const bkWrap = el('breakeven-badge-wrap');
   if (bkWrap) {
-    const bk = BREAKEVEN_COPY[r.breakeven_status] ?? BREAKEVEN_COPY.DEFICIT;
-    bkWrap.innerHTML = `<span class="breakeven-badge ${bk.cls}">${bk.icon} ${bk.text}</span>`;
+    // FIX [T3-B]: breakeven text comes from a hardcoded lookup table (not user data),
+    // but we still use createElement + textContent as a defence-in-depth practice.
+    const bk   = BREAKEVEN_COPY[r.breakeven_status] ?? BREAKEVEN_COPY.DEFICIT;
+    bkWrap.textContent = '';
+    const badge = document.createElement('span');
+    badge.className   = `breakeven-badge ${bk.cls}`;
+    badge.textContent = `${bk.icon} ${bk.text}`;
+    bkWrap.appendChild(badge);
   }
 
   const subEl = el('hero-sub');
@@ -404,6 +426,8 @@ function renderFundingMix(r) {
   setSeg('seg-esg',    esg_pct,    `ESG ${esg_pct}%`);
 
   // Detail rows
+  // FIX [T3-B security]: labels are hardcoded constants; values are fmt()-formatted
+  // numbers only (£X,XXX). No user-typed text enters these innerHTML blocks.
   const rowsEl = el('funding-rows');
   if (rowsEl) {
     rowsEl.style.display = 'block';
@@ -412,6 +436,15 @@ function renderFundingMix(r) {
       { label: 'FGS grants',      value: r.fgs_total,      color: CHART_COLORS.fgs,    pct: fgs_pct    },
       { label: 'ESG sponsorship', value: r.esg_income,     color: CHART_COLORS.esg,    pct: esg_pct    },
     ].filter(i => i.value > 0);
+
+    // FIX [T3-C]: when timber revenue is negative (high difficulty), show a muted
+    // notice rather than a negative bar or silent omission.
+    const timberNotice = r.timber_revenue < 0
+      ? `<div class="funding-timber-negative">
+           ⚠ Timber revenue: ${fmt(r.timber_revenue)} — extraction costs exceed sale value at this difficulty.
+           Grant funding is carrying the project.
+         </div>`
+      : '';
 
     rowsEl.innerHTML = items.map(i => `
       <div class="funding-row">
@@ -423,7 +456,7 @@ function renderFundingMix(r) {
           <span class="funding-row-value">${fmt(i.value)}</span>
           <span class="funding-row-pct">${i.pct}%</span>
         </div>
-      </div>`).join('');
+      </div>`).join('') + timberNotice;
   }
 
   // Donut chart — show gross inflow as centre label
@@ -621,14 +654,24 @@ function initInputEvents() {
     runCalculation();
   });
 
-  // Site size numeric input (synced to slider)
+  // FIX [3 validation]: reject 0 or negative in number input; revert on blur
   el('input-size-num')?.addEventListener('input', () => {
     const v = parseFloat(el('input-size-num').value);
     if (!isNaN(v) && v >= 0.5 && v <= 20) {
       _state.hectares = v;
       el('input-size').value = v;
+      el('input-size-num').setCustomValidity('');
+      runCalculation();
+    } else {
+      el('input-size-num').setCustomValidity('Enter a value between 0.5 and 20 hectares');
     }
-    runCalculation();
+  });
+  el('input-size-num')?.addEventListener('blur', () => {
+    const v = parseFloat(el('input-size-num').value);
+    if (isNaN(v) || v < 0.5 || v > 20) {
+      el('input-size-num').value = _state.hectares;
+      el('input-size-num').setCustomValidity('');
+    }
   });
 
   // Species dropdown
@@ -762,9 +805,17 @@ function registerServiceWorker() {
 // Boot
 // ─────────────────────────────────────────────────
 
-async function init() {
-  showOverlay();
+// FIX [5c slow-network]: show overlay synchronously so it paints before
+// any fetch/await begins. Split into sync init() + async _initAsync().
+function init() {
+  showOverlay();       // synchronous — browser can paint before first await
+  _initAsync().catch(err => {
+    console.error('PAWS init error:', err);
+    hideOverlay();
+  });
+}
 
+async function _initAsync() {
   await dbReady;
   _constants = await getConstants();
 
@@ -786,12 +837,24 @@ async function init() {
   runCalculation();
 
   hideOverlay();
+
+  // FIX [8 print]: re-render canvases before the browser rasterises the page
+  window.addEventListener('beforeprint', () => {
+    if (_lastResults) renderResults(_lastResults);
+  });
+
+  // FIX [9 a11y]: add ARIA roles to canvas elements after first render
+  const ariaMap = {
+    'chart-donut':      'Funding mix donut chart showing timber, FGS grants, and ESG income proportions',
+    'chart-projection': '15-year stacked area chart showing woodland value projection by income stream',
+  };
+  Object.entries(ariaMap).forEach(([id, label]) => {
+    const c = el(id);
+    if (c) { c.setAttribute('role', 'img'); c.setAttribute('aria-label', label); }
+  });
 }
 
-init().catch(err => {
-  console.error('PAWS init error:', err);
-  hideOverlay();
-});
+init();
 
 // ─────────────────────────────────────────────────
 // DevTools test helper

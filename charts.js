@@ -290,11 +290,13 @@ export function lineChart(canvasId, xLabels, datasets, legendId) {
   ctx.lineWidth   = 1;
   ctx.stroke();
 
+  // FIX [2 mobile]: reduce font size on narrow canvases so labels don't overlap
+  const xFontSize = w < 280 ? 9 : 10;
   // X-axis labels (every other to avoid crowding)
   xLabels.forEach((label, i) => {
     if (i % 2 === 0) {
       ctx.fillStyle    = '#9ca3af';
-      ctx.font         = '10px "Source Sans 3", system-ui, sans-serif';
+      ctx.font         = `${xFontSize}px "Source Sans 3", system-ui, sans-serif`;
       ctx.textAlign    = 'center';
       ctx.textBaseline = 'top';
       ctx.fillText(label, xPos(i), pad.top + ch + 6);
