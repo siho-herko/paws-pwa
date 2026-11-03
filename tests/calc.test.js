@@ -6,7 +6,7 @@ import {
 } from '../calc.js';
 import { readFileSync } from 'fs';
 
-const constants = JSON.parse(readFileSync('./data/paws_constants.json', 'utf8'));
+const constants = JSON.parse(readFileSync('./data/constants.json', 'utf8'));
 
 let passed = 0, failed = 0;
 function assert(condition, label, expected, actual) {

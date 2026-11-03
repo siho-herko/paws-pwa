@@ -1,0 +1,31 @@
+{
+  "note": "Reference data only — not loaded by the app. Fife PAWS area estimates by biome (NatureScot AWI).",
+  "total_ancient_woodland_ha": 3200,
+  "total_paws_estimate_ha": 1292,
+  "biomes": {
+    "Lomond & Cleish Uplands": {
+      "paws_ha": 495,
+      "dominant_species": "sitka_spruce"
+    },
+    "North Fife Hills & Tay": {
+      "paws_ha": 344,
+      "dominant_species": "mixed_conifer"
+    },
+    "West Fife Claylands": {
+      "paws_ha": 228,
+      "dominant_species": "scots_pine"
+    },
+    "Howe of Fife & Eden": {
+      "paws_ha": 133,
+      "dominant_species": "sitka_spruce"
+    },
+    "East Neuk Coast": {
+      "paws_ha": 54,
+      "dominant_species": "scots_pine"
+    },
+    "Forth Urban Coast": {
+      "paws_ha": 38,
+      "dominant_species": "mixed_conifer"
+    }
+  }
+}

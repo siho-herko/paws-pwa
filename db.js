@@ -3,8 +3,8 @@
 const DB_NAME    = 'PAWSModeller';
 const DB_VERSION = 1;
 const STORE      = 'constants';
-const RECORD_ID  = 'paws_v1';
-const SEED_URL   = './data/paws_constants.json';
+const RECORD_ID  = 'constants_v2';
+const SEED_URL   = './data/constants.json';
 
 // ─────────────────────────────────────────────────
 // Internal: open the database and seed if empty
@@ -53,7 +53,7 @@ async function _seed(db) {
   }
   const constants = await response.json();
   await _putRecord(db, constants);
-  console.info('PAWS DB seeded from paws_constants.json');
+  console.info('PAWS DB seeded from constants.json');
   return constants;
 }
 
