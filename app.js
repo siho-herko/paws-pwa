@@ -379,7 +379,7 @@ function renderBreakdown(r) {
         ${sub('Tree protection (stakes)',   r.fgs_breakdown.tree_protection_grant)}
         ${sub('Restocking grant',          r.fgs_breakdown.restocking_grant)}
         ${sub('Rhododendron clearance',    r.fgs_breakdown.rhododendron_grant)}
-        ${row('ESG / private BNG', r.esg_income, 'var(--c-positive)')}
+        ${row('Private nature sponsorship (indicative)', r.esg_income, 'var(--c-positive)')}
         <tr class="subtotal-row">
           <td>Gross inflow</td>
           <td class="val">${fmt(r.gross_inflow)}</td>
@@ -568,7 +568,7 @@ function renderProjection(r) {
     { label: 'Firewood / Biomass',  color: CHART_COLORS.timber, values: years.map(y => y.firewood)        },
     { label: 'Sporting Rights',     color: CHART_COLORS.fgs,    values: years.map(y => y.sporting)        },
     { label: 'Natural Capital',     color: CHART_COLORS.sweat,  values: years.map(y => y.natural_capital) },
-    { label: 'BNG Credits',         color: CHART_COLORS.esg,    values: years.map(y => y.bng)             },
+    { label: 'Biodiversity credits (indicative)',         color: CHART_COLORS.esg,    values: years.map(y => y.bng)             },
   ], 'legend-projection');
 
   const yr15 = years[14];

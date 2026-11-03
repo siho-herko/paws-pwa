@@ -1,0 +1,101 @@
+{
+  "version": "1.0",
+  "metadata": {
+    "source": "Scottish Forestry Grant Scheme 2024 + NatureScot AWI estimates",
+    "biome_context": "Fife, Scotland — 6 micro-biomes",
+    "last_reviewed": "2025"
+  },
+
+  "timber": {
+    "yield_tons_per_ha": 350,
+    "note": "Assumes mature 40-year-old plantation",
+    "species": {
+      "sitka_spruce": {
+        "label": "Sitka Spruce",
+        "price_per_ton": 25,
+        "note": "Lower value softwood; commonest PAWS species in Fife"
+      },
+      "scots_pine": {
+        "label": "Scots Pine",
+        "price_per_ton": 35,
+        "note": "Higher value; slower grown"
+      },
+      "larch": {
+        "label": "Larch",
+        "price_per_ton": 35,
+        "note": "Good timber value; significant Phytophthora disease risk flags may apply"
+      },
+      "mixed_conifer": {
+        "label": "Mixed Conifer",
+        "price_per_ton": 30,
+        "note": "Blended price assumption"
+      }
+    },
+    "difficulty_penalty_per_ton": {
+      "1": 0,
+      "2": 5,
+      "3": 10,
+      "4": 20,
+      "5": 30
+    },
+    "difficulty_labels": {
+      "1": "Easy — flat, road access",
+      "2": "Moderate — some slope",
+      "3": "Challenging — tracked machinery",
+      "4": "Difficult — steep terrain",
+      "5": "Severe — skyline winching"
+    }
+  },
+
+  "fgs_grants": {
+    "note": "Forestry Grant Scheme (FGS) Scotland 2024 baselines",
+    "deer_fencing_grant_per_m": 9.90,
+    "tree_protection_per_tree": 2.20,
+    "restocking_grant_per_ha": 2400,
+    "rhododendron_clearance_per_ha": 1500,
+    "natural_regen_discount": 0.7,
+    "note_regen": "Natural regen attracts ~70% of the active planting grant rate under FGS guidance"
+  },
+
+  "costs": {
+    "fencing_contractor_per_m": 12.00,
+    "note_fencing": "Real-world contractor rate; FGS grant covers ~82% of this",
+    "tree_cost_each": 2.50,
+    "note_tree": "Bare-root native broadleaf whips, including stakes and guards",
+    "trees_per_ha": 2000,
+    "agent_fee_pct": 0.12,
+    "diy_fencing_per_m": 7.50,
+    "note_diy_fencing": "Materials only — assumes landowner provides labour",
+    "diy_planting_per_tree": 0.80,
+    "note_diy_planting": "Materials only — bare-root whips, no contractor planting labour"
+  },
+
+  "esg": {
+    "min_per_ha": 1000,
+    "max_per_ha": 2500,
+    "default_per_ha": 750,
+    "note": "Private BNG / ESG sponsorship from distilleries, corporates. WCC carbon credits NOT applicable to PAWS restocking."
+  },
+
+  "long_term_values": {
+    "note": "15-year projected annual values per hectare of restored broadleaf woodland",
+    "firewood_biomass_per_ha_yr": 350,
+    "sporting_rights_per_ha_yr": 120,
+    "natural_capital_audit_per_ha_yr": 280,
+    "bng_credit_annual_per_ha": 180,
+    "note_bng": "Annualised BNG credit value assuming 30-year credit agreement"
+  },
+
+  "fife_paws_context": {
+    "total_ancient_woodland_ha": 3200,
+    "total_paws_estimate_ha": 1292,
+    "biomes": {
+      "Lomond & Cleish Uplands":   { "paws_ha": 495, "dominant_species": "sitka_spruce" },
+      "North Fife Hills & Tay":    { "paws_ha": 344, "dominant_species": "mixed_conifer" },
+      "West Fife Claylands":       { "paws_ha": 228, "dominant_species": "scots_pine" },
+      "Howe of Fife & Eden":       { "paws_ha": 133, "dominant_species": "sitka_spruce" },
+      "East Neuk Coast":           { "paws_ha": 54,  "dominant_species": "scots_pine" },
+      "Forth Urban Coast":         { "paws_ha": 38,  "dominant_species": "mixed_conifer" }
+    }
+  }
+}

@@ -6,7 +6,10 @@ import {
 } from '../calc.js';
 import { readFileSync } from 'fs';
 
-const constants = JSON.parse(readFileSync('./data/paws_constants.json', 'utf8'));
+// Formula tests run against a frozen copy of the v1.0 constants so they test the
+// calculations, not the rates. The live v2.0 rates are checked separately below.
+const constants = JSON.parse(readFileSync('./tests/fixtures/paws_constants_v1.json', 'utf8'));
+const live      = JSON.parse(readFileSync('./data/paws_constants.json', 'utf8'));
 
 let passed = 0, failed = 0;
 function assert(condition, label, expected, actual) {
@@ -197,5 +200,21 @@ for (let i = 0; i < allResults.length; i++) {
 
 // ── Summary ────────────────────────────────────────────────────────────────
 
+
+// ── Live constants (v2.0) sanity checks ─────────────────────────────────────
+console.log('\n=== Live constants v2.0 ===');
+assert(live.version === '2.0', 'live version is 2.0', '2.0', live.version);
+assert(live.fgs_grants.restocking_grant_per_ha === 550, 'restocking = WIG Restructuring Regeneration £550/ha', 550, live.fgs_grants.restocking_grant_per_ha);
+assert(live.esg.min_per_ha <= live.esg.default_per_ha && live.esg.default_per_ha <= live.esg.max_per_ha,
+  'ESG default within min–max', `${live.esg.min_per_ha}–${live.esg.max_per_ha}`, live.esg.default_per_ha);
+assert(!!live.metadata?.sources && !!live.metadata?.last_updated, 'metadata has sources and last_updated');
+{
+  const rl = calculate({ hectares:4, species:'sitka_spruce', difficulty:1, fencing_m:400,
+    natural_regen_pct:40, esg_per_ha:750, hire_agent:false,
+    override_yield:null, override_fencing_grant:null, override_restocking_grant:null }, live);
+  // 4 ha: 60% planted × 550 + 40% regen × 550 × 0.7 = 1320 + 616
+  assert(near(rl.fgs_breakdown.restocking_grant, 1936), 'live: restocking grant 4 ha = £1,936', 1936, rl.fgs_breakdown.restocking_grant);
+  assert(near(rl.fgs_breakdown.tree_protection_grant, 9600), 'live: tree protection 4,800 trees × £2.00', 9600, rl.fgs_breakdown.tree_protection_grant);
+}
 console.log(`\n${ failed === 0 ? '✓' : '✗' } ${passed} passed · ${failed} failed\n`);
 if (failed > 0) process.exit(1);
