@@ -11,7 +11,7 @@
  *   configureForType() — shows/hides form sections for the selected project type
  */
 
-import { dbReady, getConstants, resetConstants } from './db.js';
+import { dbReady, getConstants, resetConstants, saveConstants } from './db.js';
 import {
   calculate,
   suggestPerimeter,
@@ -28,6 +28,7 @@ import {
   encodeState,
   buildInputs,
   patchConstants,
+  pickOverrides,
   TYPE_SPECIFIC_ADV_KEYS,
 } from './state.js';
 import { donutChart, lineChart, CHART_COLORS } from './charts.js';
@@ -89,6 +90,11 @@ function rateFor(item) {
   return item ? item.rate.split('.').reduce((o, k) => o?.[k], _constants) : null;
 }
 
+function agentPct() {
+  const pct = _state.adv_agent_fee_pct ?? (_constants.costs.agent_fee_pct ?? 0.12) * 100;
+  return Math.round(pct * 10) / 10;
+}
+
 // ─────────────────────────────────────────────────
 // Project type selector + per-type form configuration
 // ─────────────────────────────────────────────────
@@ -136,6 +142,7 @@ function setProjectType(type) {
     adv_yield:         _state.adv_yield,
     adv_sitka_price:   _state.adv_sitka_price,
     adv_scots_price:   _state.adv_scots_price,
+    adv_mixed_price:   _state.adv_mixed_price,
     adv_agent_fee_pct: _state.adv_agent_fee_pct,
   };
   _state = { ...defaultState(type, _constants), ...keep };
@@ -149,6 +156,7 @@ function setProjectType(type) {
   configureForType();
   applyStateToDOM(_state);
   populateAdvancedFields(_constants);
+  persistOverrides();
   runCalculation();
 }
 
@@ -235,7 +243,7 @@ function configureForType() {
   // Advanced settings
   show('adv-group-timber', timberPossible);
   const pawsPrices = _state.project_type === 'paws';
-  ['adv-sitka-price', 'adv-scots-price'].forEach(id => {
+  ['adv-sitka-price', 'adv-scots-price', 'adv-mixed-price'].forEach(id => {
     const field = el(id)?.closest('.advanced-field');
     if (field) field.hidden = !pawsPrices;
   });
@@ -318,6 +326,7 @@ function applyStateToDOM(s) {
   setIfSet('adv-restocking-grant', s.adv_restocking_grant);
   setIfSet('adv-sitka-price',      s.adv_sitka_price);
   setIfSet('adv-scots-price',      s.adv_scots_price);
+  setIfSet('adv-mixed-price',      s.adv_mixed_price);
   setIfSet('adv-trees-per-ha',     s.adv_trees_per_ha);
   setIfSet('adv-tree-cost',        s.adv_tree_cost);
   setIfSet('adv-agent-fee',        s.adv_agent_fee_pct);
@@ -341,6 +350,7 @@ function populateAdvancedFields(c) {
   set('adv-yield',            p.timber_yield_t_per_ha ?? c.timber?.yield_tons_per_ha);
   set('adv-sitka-price',      c.timber?.species?.sitka_spruce?.price_per_ton);
   set('adv-scots-price',      c.timber?.species?.scots_pine?.price_per_ton);
+  set('adv-mixed-price',      c.timber?.species?.mixed_conifer?.price_per_ton);
   set('adv-fencing-grant',    rateValue(rateFor(overrideItem('fencing')[0])) || null);
   set('adv-restocking-grant', establishmentDefault(c));
   set('adv-trees-per-ha',     costs.trees_per_ha);
@@ -349,12 +359,31 @@ function populateAdvancedFields(c) {
 }
 
 // ─────────────────────────────────────────────────
-// Debounce utility
+// Advanced overrides persistence (IndexedDB)
 // ─────────────────────────────────────────────────
 
 function debounce(fn, ms) {
   let t;
   return (...args) => { clearTimeout(t); t = setTimeout(() => fn(...args), ms); };
+}
+
+const persistOverrides = debounce(() => {
+  if (!_constants || !_state) return;
+  const user_overrides = { project_type: _state.project_type, values: pickOverrides(_state) };
+  _constants = { ..._constants, user_overrides };
+  saveConstants(_constants).catch(err => console.warn('Could not save advanced settings:', err));
+}, 600);
+
+/** Applies saved Advanced settings on a fresh visit (no scenario in the URL). */
+function applySavedOverrides(state, constants) {
+  const saved = constants.user_overrides;
+  if (!saved?.values) return state;
+  const out = { ...state };
+  for (const [k, v] of Object.entries(saved.values)) {
+    if (TYPE_SPECIFIC_ADV_KEYS.includes(k) && saved.project_type !== state.project_type) continue;
+    out[k] = v;
+  }
+  return out;
 }
 
 // ─────────────────────────────────────────────────
@@ -440,6 +469,7 @@ function updateLiveLabels(s) {
   el('label-diy')?.classList.toggle('active', !s.hire_agent);
   el('label-agent')?.classList.toggle('active', s.hire_agent);
   el('agent-fee-notice')?.classList.toggle('visible', s.hire_agent);
+  set('agent-fee-notice', `–${agentPct()}% management fee on gross inflow`);
 
   // Sister tool nudge — show once a calculation is in progress, with live size
   const nudge     = el('sister-nudge');
@@ -588,7 +618,7 @@ function renderBreakdown(r) {
     .filter(i => i.contractor > 0 || (!linear && (i.key === 'fencing' || i.key === 'planting')) || (linear && i.key === 'planting'))
     .map(i => row(i.label, -i.contractor, 'var(--c-ink)'))
     .join('');
-  const agentLabel = 'Forestry agent fee (12%)';
+  const agentLabel = `${linear ? 'Agent' : 'Forestry agent'} fee (${Math.round(r.agent_fee_pct * 1000) / 10}%)`;
 
   wrap.innerHTML = `
     <table class="breakdown-table">
@@ -950,6 +980,7 @@ function initInputEvents() {
       const rg = el('adv-restocking-grant');
       if (rg) { rg.value = ''; populateAdvancedFields(_constants); }
     }
+    persistOverrides();
     runCalculation();
   });
 
@@ -978,6 +1009,7 @@ function initInputEvents() {
     ['adv-restocking-grant',  'adv_restocking_grant'],
     ['adv-sitka-price',       'adv_sitka_price'],
     ['adv-scots-price',       'adv_scots_price'],
+    ['adv-mixed-price',       'adv_mixed_price'],
     ['adv-trees-per-ha',      'adv_trees_per_ha'],
     ['adv-tree-cost',         'adv_tree_cost'],
     ['adv-agent-fee',         'adv_agent_fee_pct'],
@@ -990,6 +1022,7 @@ function initInputEvents() {
         const d = el('input-density');
         if (d) d.value = _state.adv_trees_per_ha;
       }
+      persistOverrides();
       dCalc();
     });
   });
@@ -1002,7 +1035,7 @@ function initInputEvents() {
     // Clear all advanced overrides in state
     Object.assign(_state, {
       adv_yield: null, adv_fencing_grant: null, adv_restocking_grant: null,
-      adv_sitka_price: null, adv_scots_price: null,
+      adv_sitka_price: null, adv_scots_price: null, adv_mixed_price: null,
       adv_trees_per_ha: null, adv_tree_cost: null, adv_agent_fee_pct: null,
     });
 
@@ -1073,9 +1106,10 @@ async function _initAsync() {
   await dbReady;
   _constants = await getConstants();
 
-  // Restore state from URL if present (links without `type` decode as PAWS)
+  // Restore state from URL if present (links without `type` decode as PAWS);
+  // otherwise start from PAWS defaults plus any saved Advanced settings.
   const urlState = decodeState(window.location.search, _constants);
-  _state = urlState ?? defaultState('paws', _constants);
+  _state = urlState ?? applySavedOverrides(defaultState('paws', _constants), _constants);
 
   buildTypeSelector();
   configureForType();

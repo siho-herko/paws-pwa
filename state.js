@@ -8,7 +8,7 @@ import { PROJECT_TYPES, DEFAULT_PROJECT_TYPE, getProfile } from './calc.js';
 
 export const ADV_KEYS = [
   'adv_yield', 'adv_fencing_grant', 'adv_restocking_grant',
-  'adv_sitka_price', 'adv_scots_price',
+  'adv_sitka_price', 'adv_scots_price', 'adv_mixed_price',
   'adv_trees_per_ha', 'adv_tree_cost', 'adv_agent_fee_pct',
 ];
 
@@ -96,6 +96,7 @@ export function encodeState(state) {
   enc('rg',    state.adv_restocking_grant);
   enc('sitka', state.adv_sitka_price);
   enc('scots', state.adv_scots_price);
+  enc('mixed', state.adv_mixed_price);
   enc('tph',   state.adv_trees_per_ha);
   enc('tc',    state.adv_tree_cost);
   enc('af',    state.adv_agent_fee_pct);
@@ -159,6 +160,7 @@ export function decodeState(search, constants) {
     adv_restocking_grant: pN('rg'),
     adv_sitka_price:      pN('sitka'),
     adv_scots_price:      pN('scots'),
+    adv_mixed_price:      pN('mixed'),
     adv_trees_per_ha:     pN('tph'),
     adv_tree_cost:        pN('tc'),
     adv_agent_fee_pct:    pN('af'),
@@ -212,6 +214,7 @@ export function buildInputs(state) {
 export function patchConstants(state, base) {
   const needsPatch = state.adv_sitka_price  != null
     || state.adv_scots_price   != null
+    || state.adv_mixed_price   != null
     || state.adv_trees_per_ha  != null
     || state.adv_tree_cost     != null
     || state.adv_agent_fee_pct != null;
@@ -227,6 +230,9 @@ export function patchConstants(state, base) {
     c.timber.species.scots_pine.price_per_ton = state.adv_scots_price;
     c.timber.species.larch.price_per_ton      = state.adv_scots_price;
   }
+
+  if (state.adv_mixed_price != null)
+    c.timber.species.mixed_conifer.price_per_ton = state.adv_mixed_price;
 
   const profile = c.profiles?.[state.project_type];
   const profileCosts = profile ? (profile.costs ??= {}) : null;
@@ -249,4 +255,11 @@ export function patchConstants(state, base) {
     c.costs.agent_fee_pct = state.adv_agent_fee_pct / 100;
 
   return c;
+}
+
+/** Picks the advanced overrides out of a state object (for persistence). */
+export function pickOverrides(state) {
+  const o = {};
+  for (const k of ADV_KEYS) if (state[k] != null) o[k] = state[k];
+  return o;
 }

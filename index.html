@@ -34,13 +34,7 @@
   <header class="site-header" role="banner">
     <div class="header-main">
       <div class="header-brand">
-        <img
-          src="icons/nfca-logo.svg"
-          alt="NFCA"
-          class="header-logo"
-          onerror="this.style.display='none'; this.nextElementSibling.style.display='inline';"
-        >
-        <span class="header-logo-fallback" style="display:none;">NFCA</span>
+        <span class="header-logo-fallback">NFCA</span>
         <div>
           <div class="header-title">
             Woodland Restoration Calculator
@@ -470,7 +464,7 @@
               <div class="advanced-accordion-body" id="advanced-body">
                 <p class="helper-text" style="margin-bottom:14px;">
                   Override calculation constants for site-specific estimates.
-                  Changes apply after a short pause. Leave blank to use defaults.
+                  Changes apply after a short pause and are saved on this device. Leave blank to use defaults.
                 </p>
 
                 <div id="adv-group-timber">
@@ -489,6 +483,11 @@
                     <label for="adv-scots-price">Scots Pine / Larch price (£/ton)</label>
                     <input type="number" class="adv-override" id="adv-scots-price"
                            placeholder="35" min="5" max="100" step="1">
+                  </div>
+                  <div class="advanced-field">
+                    <label for="adv-mixed-price">Mixed Conifer price (£/ton)</label>
+                    <input type="number" class="adv-override" id="adv-mixed-price"
+                           placeholder="30" min="5" max="100" step="1">
                   </div>
                 </div>
 
