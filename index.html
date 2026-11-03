@@ -72,50 +72,129 @@
       <div class="panel-controls-inner">
         <div class="panel-controls-header">
           <h2>Configure Your Site</h2>
-          <p>Adjust inputs to model your specific woodland</p>
+          <p>Choose a project type, then adjust inputs to model your site</p>
         </div>
 
-        <!-- ── Section 1: Your Woodland ── -->
+        <!-- ── Project type selector (buttons built from constants profiles) ── -->
+        <div class="type-selector-wrap">
+          <div class="type-selector-label" id="type-selector-label">Project type</div>
+          <div class="type-selector" id="type-selector" role="radiogroup" aria-labelledby="type-selector-label"></div>
+          <p class="helper-text mt-8" id="type-description"></p>
+        </div>
+
+        <!-- ── Section 1: Your Woodland / Your Hedge ── -->
         <div class="input-section open" id="section-woodland">
           <div class="input-section-header" role="button" tabindex="0" aria-expanded="true" aria-controls="body-woodland">
-            <h3><span class="section-number">01</span> Your Woodland</h3>
+            <h3><span class="section-number">01</span> <span id="title-woodland">Your Woodland</span></h3>
             <span class="section-chevron">▼</span>
           </div>
           <div class="input-section-body" id="body-woodland">
 
-            <div class="slider-row">
-              <label for="input-size">
-                Site size
-                <span class="slider-value mono" id="val-size">4.0 ha</span>
-              </label>
-              <input
-                type="range"
-                id="input-size"
-                min="0.5" max="20" step="0.5"
-                value="4"
-                aria-label="Site size in hectares"
-              >
-              <div class="slider-track-labels">
-                <span>0.5 ha</span>
-                <span>20 ha</span>
+            <div id="block-area-size">
+              <div class="slider-row">
+                <label for="input-size">
+                  Site size
+                  <span class="slider-value mono" id="val-size">4.0 ha</span>
+                </label>
+                <input
+                  type="range"
+                  id="input-size"
+                  min="0.5" max="20" step="0.5"
+                  value="4"
+                  aria-label="Site size in hectares"
+                >
+                <div class="slider-track-labels">
+                  <span>0.5 ha</span>
+                  <span>20 ha</span>
+                </div>
+              </div>
+
+              <div class="number-input-row">
+                <label for="input-size-num">Or type:</label>
+                <input
+                  type="number"
+                  id="input-size-num"
+                  min="0.5" max="20" step="0.5"
+                  value="4"
+                  aria-label="Site size numeric input"
+                >
+                <span class="text-muted" style="font-size:0.8rem;">ha</span>
               </div>
             </div>
 
-            <div class="number-input-row">
-              <label for="input-size-num">Or type:</label>
-              <input
-                type="number"
-                id="input-size-num"
-                min="0.5" max="20" step="0.5"
-                value="4"
-                aria-label="Site size numeric input"
-              >
-              <span class="text-muted" style="font-size:0.8rem;">ha</span>
+            <div id="block-density" class="mt-12" hidden>
+              <div class="slider-row">
+                <label for="input-density">
+                  Tree density
+                  <span class="slider-value mono" id="val-density">200 trees/ha</span>
+                </label>
+                <input type="range" id="input-density" min="100" max="400" step="10" value="200"
+                       aria-label="Agroforestry tree density in trees per hectare">
+                <div class="slider-track-labels">
+                  <span>100/ha</span>
+                  <span>400/ha</span>
+                </div>
+              </div>
+              <p class="helper-text">FGS Agroforestry pays two rates: 150–200 and 300–400 trees/ha. Densities in between get the lower rate.</p>
+            </div>
+
+            <div id="block-linear-size" hidden>
+              <div class="slider-row">
+                <label for="input-length">
+                  Hedge length
+                  <span class="slider-value mono" id="val-length">400 m</span>
+                </label>
+                <input type="range" id="input-length" min="0" max="5000" step="10" value="400"
+                       aria-label="Hedge length in metres">
+                <div class="slider-track-labels">
+                  <span>0 m</span>
+                  <span>5,000 m</span>
+                </div>
+              </div>
+              <div class="number-input-row">
+                <label for="input-length-num">Or type:</label>
+                <input type="number" id="input-length-num" min="0" max="5000" step="10" value="400"
+                       aria-label="Hedge length numeric input">
+                <span class="text-muted" style="font-size:0.8rem;">m</span>
+              </div>
+
+              <div class="mt-12">
+                <label class="select-label" for="input-hedge-mode">Work type</label>
+                <select id="input-hedge-mode" aria-label="Hedge work type">
+                  <option value="restore">Restore an existing hedge</option>
+                  <option value="create">Plant a new hedge</option>
+                </select>
+              </div>
+
+              <div class="slider-row mt-12" id="gap-row">
+                <label for="input-gap">
+                  Gaps to plant up
+                  <span class="slider-value mono" id="val-gap">20%</span>
+                </label>
+                <input type="range" id="input-gap" min="0" max="100" step="5" value="20"
+                       aria-label="Percentage of hedge length that is gaps to replant">
+                <div class="slider-track-labels">
+                  <span>0%</span>
+                  <span>100%</span>
+                </div>
+              </div>
+              <div class="stat-chips mt-8">
+                <span class="stat-chip planting" id="plant-chip">80 m to plant</span>
+                <span class="stat-chip" id="plants-chip">480 plants</span>
+              </div>
+
+              <div class="number-input-row mt-12">
+                <label for="input-ppm">Plants per metre:</label>
+                <input type="number" id="input-ppm" min="1" max="10" step="0.5" value="6"
+                       aria-label="Plants per metre">
+                <span class="text-muted" style="font-size:0.8rem;">double staggered row = 6</span>
+              </div>
+              <p class="helper-text">AECS funds gaps over 5 m, planted as a double row with at least 6 plants/m.</p>
             </div>
 
             <div class="mt-12">
-              <label class="select-label" for="input-species">Conifer species</label>
-              <select id="input-species" aria-label="Select conifer species">
+              <label class="select-label" for="input-species" id="species-label">Conifer species</label>
+              <select id="input-species" aria-labelledby="species-label">
                 <option value="sitka_spruce">Sitka Spruce</option>
                 <option value="scots_pine">Scots Pine</option>
                 <option value="larch">Larch</option>
@@ -139,102 +218,180 @@
           </div>
           <div class="input-section-body" id="body-harvest">
 
-            <div class="slider-row">
-              <label for="input-difficulty">
-                Access difficulty
-                <span class="slider-value mono" id="val-difficulty">2</span>
-              </label>
-              <input
-                type="range"
-                id="input-difficulty"
-                min="1" max="5" step="1"
-                value="2"
-                aria-label="Harvesting difficulty 1 to 5"
-              >
-              <div class="slider-track-labels">
-                <span>Easy</span>
-                <span>Severe</span>
+            <label class="checkbox-row" for="input-timber" id="block-timber-toggle" hidden>
+              <input type="checkbox" id="input-timber">
+              Standing timber to harvest (e.g. non-native or windblown trees)
+            </label>
+
+            <div id="block-difficulty">
+              <div class="slider-row">
+                <label for="input-difficulty">
+                  Access difficulty
+                  <span class="slider-value mono" id="val-difficulty">2</span>
+                </label>
+                <input
+                  type="range"
+                  id="input-difficulty"
+                  min="1" max="5" step="1"
+                  value="2"
+                  aria-label="Harvesting difficulty 1 to 5"
+                >
+                <div class="slider-track-labels">
+                  <span>Easy</span>
+                  <span>Severe</span>
+                </div>
               </div>
+              <div class="mt-4">
+                <span class="difficulty-label moderate" id="difficulty-badge">Moderate — some slope</span>
+              </div>
+              <p class="helper-text mt-8">
+                This is the single biggest variable. Steep gorge sites can make timber a net loss.
+              </p>
             </div>
-            <div class="mt-4">
-              <span class="difficulty-label moderate" id="difficulty-badge">Moderate — some slope</span>
-            </div>
-            <p class="helper-text mt-8">
-              This is the single biggest variable. Steep gorge sites can make timber a net loss.
-            </p>
 
           </div>
         </div>
 
-        <!-- ── Section 3: Deer Fencing ── -->
+        <!-- ── Section 3: Fencing ── -->
         <div class="input-section open" id="section-fencing">
           <div class="input-section-header" role="button" tabindex="0" aria-expanded="true" aria-controls="body-fencing">
-            <h3><span class="section-number">03</span> Deer Fencing</h3>
+            <h3><span class="section-number">03</span> <span id="title-fencing">Deer Fencing</span></h3>
             <span class="section-chevron">▼</span>
           </div>
           <div class="input-section-body" id="body-fencing">
 
-            <div class="slider-row" id="fencing-slider-row">
-              <label for="input-perimeter">
-                Perimeter length
-                <span class="slider-value mono" id="val-perimeter">400 m</span>
-              </label>
-              <input
-                type="range"
-                id="input-perimeter"
-                min="0" max="3000" step="50"
-                value="400"
-                aria-label="Deer fence perimeter in metres"
-              >
-              <div class="slider-track-labels">
-                <span>0 m</span>
-                <span>3,000 m</span>
+            <div id="block-area-fence">
+              <div class="slider-row" id="fencing-slider-row">
+                <label for="input-perimeter">
+                  Perimeter length
+                  <span class="slider-value mono" id="val-perimeter">400 m</span>
+                </label>
+                <input
+                  type="range"
+                  id="input-perimeter"
+                  min="0" max="3000" step="50"
+                  value="400"
+                  aria-label="Fence perimeter in metres"
+                >
+                <div class="slider-track-labels">
+                  <span>0 m</span>
+                  <span>3,000 m</span>
+                </div>
               </div>
-            </div>
-            <div class="auto-calc-text" id="perimeter-suggest">
-              Suggested: ≈ <span id="perimeter-auto">—</span> m &nbsp;(√(ha × 10,000) × 4 × 1.2)
+              <div class="auto-calc-text" id="perimeter-suggest">
+                Suggested: ≈ <span id="perimeter-auto">—</span> m &nbsp;(√(ha × 10,000) × 4 × 1.2)
+              </div>
+
+              <label class="checkbox-row mt-8" for="input-no-fence">
+                <input type="checkbox" id="input-no-fence">
+                <span id="no-fence-label">No deer pressure — fencing not needed</span>
+              </label>
+              <p class="helper-text mt-8" id="fence-note" hidden></p>
             </div>
 
-            <label class="checkbox-row mt-8" for="input-no-fence">
-              <input type="checkbox" id="input-no-fence" aria-label="No deer pressure — fencing not needed">
-              No deer pressure — fencing not needed
-            </label>
+            <div id="block-linear-fence" hidden>
+              <div class="slider-row">
+                <label for="input-stock-fence">
+                  Stock fence length
+                  <span class="slider-value mono" id="val-stock-fence">400 m</span>
+                </label>
+                <input type="range" id="input-stock-fence" min="0" max="10000" step="10" value="400"
+                       aria-label="Stock fence length in metres">
+                <div class="slider-track-labels">
+                  <span>0 m</span>
+                  <span>10,000 m</span>
+                </div>
+              </div>
+              <p class="helper-text">
+                Fence one side for the hedge length, or both sides for twice the length. New fences sit at least 1 m from the hedge centre line.
+              </p>
+            </div>
 
           </div>
         </div>
 
-        <!-- ── Section 4: Regeneration Strategy ── -->
+        <!-- ── Section 4: Regeneration / Hedge works ── -->
         <div class="input-section open" id="section-regen">
           <div class="input-section-header" role="button" tabindex="0" aria-expanded="true" aria-controls="body-regen">
-            <h3><span class="section-number">04</span> Regeneration Strategy</h3>
+            <h3><span class="section-number">04</span> <span id="title-regen">Regeneration Strategy</span></h3>
             <span class="section-chevron">▼</span>
           </div>
           <div class="input-section-body" id="body-regen">
 
-            <div class="slider-row">
-              <label for="input-regen">
-                Natural regeneration
-                <span class="slider-value mono" id="val-regen">40%</span>
+            <div id="block-regen">
+              <div class="slider-row">
+                <label for="input-regen">
+                  Natural regeneration
+                  <span class="slider-value mono" id="val-regen">40%</span>
+                </label>
+                <input
+                  type="range"
+                  id="input-regen"
+                  min="0" max="100" step="5"
+                  value="40"
+                  aria-label="Percentage of site using natural regeneration"
+                >
+                <div class="slider-track-labels">
+                  <span>0%</span>
+                  <span>100%</span>
+                </div>
+              </div>
+              <div class="stat-chips mt-8">
+                <span class="stat-chip" id="regen-chip">40% natural regen</span>
+                <span class="stat-chip planting" id="planting-chip">60% active planting</span>
+              </div>
+              <p class="helper-text mt-8">
+                Natural regen costs nothing but takes 3–5 years longer. Higher on sites with adjacent ancient wood seed sources.
+              </p>
+            </div>
+
+            <div id="block-rhodo" class="mt-12">
+              <label class="checkbox-row" for="input-rhodo">
+                <input type="checkbox" id="input-rhodo">
+                <span id="rhodo-label">Rhododendron / invasive clearance</span>
               </label>
-              <input
-                type="range"
-                id="input-regen"
-                min="0" max="100" step="5"
-                value="40"
-                aria-label="Percentage of site using natural regeneration"
-              >
-              <div class="slider-track-labels">
-                <span>0%</span>
-                <span>100%</span>
+              <div class="slider-row mt-8" id="rhodo-slider-row">
+                <label for="input-rhodo-pct">
+                  Area affected
+                  <span class="slider-value mono" id="val-rhodo-pct">100%</span>
+                </label>
+                <input type="range" id="input-rhodo-pct" min="0" max="100" step="5" value="100"
+                       aria-label="Percentage of site affected by invasives">
+                <div class="slider-track-labels">
+                  <span>0%</span>
+                  <span>100%</span>
+                </div>
               </div>
             </div>
-            <div class="stat-chips mt-8">
-              <span class="stat-chip" id="regen-chip">40% natural regen</span>
-              <span class="stat-chip planting" id="planting-chip">60% active planting</span>
+
+            <div id="block-hedge-works" hidden>
+              <div class="slider-row">
+                <label for="input-lay">
+                  Hedge to lay
+                  <span class="slider-value mono" id="val-lay">0 m</span>
+                </label>
+                <input type="range" id="input-lay" min="0" max="5000" step="10" value="0"
+                       aria-label="Length of hedge to lay in metres">
+              </div>
+              <div class="slider-row">
+                <label for="input-coppice">
+                  Hedge to coppice
+                  <span class="slider-value mono" id="val-coppice">0 m</span>
+                </label>
+                <input type="range" id="input-coppice" min="0" max="5000" step="10" value="0"
+                       aria-label="Length of hedge to coppice in metres">
+              </div>
+              <p class="helper-text" id="hedge-works-note">Laying and coppicing apply to the existing hedge, not the gaps.</p>
+
+              <div class="mt-12">
+                <label class="select-label" for="input-guards">Plant guards</label>
+                <select id="input-guards" aria-label="Plant guards for new hedge plants">
+                  <option value="none">None (existing stock-proof fence)</option>
+                  <option value="vole">Vole guards</option>
+                  <option value="rabbit">Rabbit / hare guards</option>
+                </select>
+              </div>
             </div>
-            <p class="helper-text mt-8">
-              Natural regen costs nothing but takes 3–5 years longer. Higher on sites with adjacent ancient wood seed sources.
-            </p>
 
           </div>
         </div>
@@ -247,21 +404,33 @@
           </div>
           <div class="input-section-body" id="body-funding">
 
-            <div class="slider-row">
+            <div class="slider-row" id="block-esg-ha">
               <label for="input-esg">
                 ESG sponsorship rate
-                <span class="slider-value mono" id="val-esg">£750/ha</span>
+                <span class="slider-value mono" id="val-esg">£1,000/ha</span>
               </label>
               <input
                 type="range"
                 id="input-esg"
                 min="0" max="2500" step="50"
-                value="750"
+                value="1000"
                 aria-label="ESG sponsorship rate per hectare"
               >
               <div class="slider-track-labels">
                 <span>£0</span>
                 <span>£2,500/ha</span>
+              </div>
+            </div>
+            <div class="slider-row" id="block-esg-m" hidden>
+              <label for="input-esg-m">
+                Sponsorship rate
+                <span class="slider-value mono" id="val-esg-m">£1.00/m</span>
+              </label>
+              <input type="range" id="input-esg-m" min="0" max="10" step="0.5" value="1"
+                     aria-label="Sponsorship rate per metre of hedge">
+              <div class="slider-track-labels">
+                <span>£0</span>
+                <span>£10/m</span>
               </div>
             </div>
             <p class="helper-text mt-8">
@@ -304,45 +473,47 @@
                   Changes apply after a short pause. Leave blank to use defaults.
                 </p>
 
-                <div class="adv-section-label">Timber</div>
-                <div class="advanced-field">
-                  <label for="adv-yield">Timber yield (tons/ha)</label>
-                  <input type="number" class="adv-override" id="adv-yield"
-                         placeholder="350" min="50" max="600" step="10">
-                </div>
-                <div class="advanced-field">
-                  <label for="adv-sitka-price">Sitka Spruce price (£/ton)</label>
-                  <input type="number" class="adv-override" id="adv-sitka-price"
-                         placeholder="25" min="5" max="80" step="1">
-                </div>
-                <div class="advanced-field">
-                  <label for="adv-scots-price">Scots Pine / Larch price (£/ton)</label>
-                  <input type="number" class="adv-override" id="adv-scots-price"
-                         placeholder="35" min="5" max="100" step="1">
+                <div id="adv-group-timber">
+                  <div class="adv-section-label">Timber</div>
+                  <div class="advanced-field">
+                    <label for="adv-yield">Timber yield (tons/ha)</label>
+                    <input type="number" class="adv-override" id="adv-yield"
+                           placeholder="350" min="10" max="600" step="10">
+                  </div>
+                  <div class="advanced-field">
+                    <label for="adv-sitka-price">Sitka Spruce price (£/ton)</label>
+                    <input type="number" class="adv-override" id="adv-sitka-price"
+                           placeholder="25" min="5" max="80" step="1">
+                  </div>
+                  <div class="advanced-field">
+                    <label for="adv-scots-price">Scots Pine / Larch price (£/ton)</label>
+                    <input type="number" class="adv-override" id="adv-scots-price"
+                           placeholder="35" min="5" max="100" step="1">
+                  </div>
                 </div>
 
-                <div class="adv-section-label">FGS Grants</div>
-                <div class="advanced-field">
-                  <label for="adv-fencing-grant">Deer fencing grant (£/m)</label>
+                <div class="adv-section-label" id="adv-grants-label">FGS Grants</div>
+                <div class="advanced-field" id="adv-field-fencing-grant">
+                  <label for="adv-fencing-grant" id="adv-fencing-grant-label">Deer fencing grant (£/m)</label>
                   <input type="number" class="adv-override" id="adv-fencing-grant"
                          placeholder="9.90" min="0" max="20" step="0.10">
                 </div>
-                <div class="advanced-field">
-                  <label for="adv-restocking-grant">Restocking grant (£/ha)</label>
+                <div class="advanced-field" id="adv-field-restocking-grant">
+                  <label for="adv-restocking-grant" id="adv-restocking-grant-label">Restocking grant (£/ha)</label>
                   <input type="number" class="adv-override" id="adv-restocking-grant"
-                         placeholder="2400" min="0" max="6000" step="100">
+                         placeholder="2400" min="0" max="10000" step="0.01">
                 </div>
 
                 <div class="adv-section-label">Planting Costs</div>
-                <div class="advanced-field">
+                <div class="advanced-field" id="adv-field-trees">
                   <label for="adv-trees-per-ha">Trees per hectare</label>
                   <input type="number" class="adv-override" id="adv-trees-per-ha"
-                         placeholder="2000" min="500" max="4000" step="100">
+                         placeholder="2000" min="10" max="4000" step="10">
                 </div>
                 <div class="advanced-field">
-                  <label for="adv-tree-cost">Tree cost each (£)</label>
+                  <label for="adv-tree-cost" id="adv-tree-cost-label">Tree cost each (£)</label>
                   <input type="number" class="adv-override" id="adv-tree-cost"
-                         placeholder="2.50" min="0.50" max="10" step="0.10">
+                         placeholder="2.50" min="0.10" max="500" step="0.10">
                 </div>
 
                 <div class="adv-section-label">Management</div>
@@ -356,14 +527,13 @@
                   ↺ Reset to Scottish Forestry defaults
                 </button>
                 <p class="helper-text" style="margin-top:10px;">
-                  Default values from Scottish Forestry Grant Scheme 2024. Override for site-specific estimates.
+                  Default grant values are published FGS and AECS rates, flagged for verification before release. Override for site-specific estimates.
                 </p>
               </div>
             </div>
 
           </div>
         </div>
-
       </div><!-- /panel-controls-inner -->
     </aside>
 
@@ -406,6 +576,9 @@
           <div id="breakeven-badge-wrap" style="margin-top:10px;"></div>
           <div class="result-hero-sub" id="hero-sub" style="margin-top:6px;opacity:.65;font-size:0.8rem;"></div>
         </div>
+
+        <!-- Eligibility notices (e.g. hedge planting below AECS density) -->
+        <div id="result-notices" class="result-notices" aria-live="polite"></div>
 
         <!-- Breakdown card -->
         <div class="result-card" style="margin-top:-6px; border-top-left-radius:0; border-top-right-radius:0;">
@@ -487,11 +660,11 @@
       <section id="result-projection" aria-label="15-year asset projection">
         <div class="result-card">
           <div class="result-card-header">
-            <span class="result-card-title">15-Year Woodland Value Projection</span>
+            <span class="result-card-title" id="projection-title">15-Year Woodland Value Projection</span>
             <span class="result-card-badge">Annual income once established</span>
           </div>
 
-          <p class="helper-text" style="margin-bottom:12px;">
+          <p class="helper-text" style="margin-bottom:12px;" id="projection-helper">
             What your restored broadleaf woodland earns once the canopy establishes.
             Hover over the chart for year-by-year detail.
           </p>

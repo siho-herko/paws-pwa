@@ -5,9 +5,10 @@
  * Architecture:
  *   _state       — single source of truth for all inputs & overrides
  *   _constants   — base constants from IndexedDB (never mutated)
- *   patchConstants() — deep-clones _constants and applies _state overrides
- *   buildInputs() — extracts calc-facing input object from _state
+ *   patchConstants() — deep-clones _constants and applies _state overrides (state.js)
+ *   buildInputs() — extracts calc-facing input object from _state (state.js)
  *   runCalculation() — patches constants, calculates, renders, encodes URL
+ *   configureForType() — shows/hides form sections for the selected project type
  */
 
 import { dbReady, getConstants, resetConstants } from './db.js';
@@ -16,36 +17,26 @@ import {
   suggestPerimeter,
   difficultyLabel,
   difficultyClass,
-  speciesLabel,
-  speciesIcon,
+  getProfile,
+  effectiveCosts,
+  rateValue,
+  PROJECT_TYPES,
 } from './calc.js';
+import {
+  defaultState,
+  decodeState,
+  encodeState,
+  buildInputs,
+  patchConstants,
+  TYPE_SPECIFIC_ADV_KEYS,
+} from './state.js';
 import { donutChart, lineChart, CHART_COLORS } from './charts.js';
 
 // ─────────────────────────────────────────────────
 // Application state — single source of truth
 // ─────────────────────────────────────────────────
 
-const _state = {
-  // Primary inputs
-  hectares:          4.0,
-  species:           'sitka_spruce',
-  difficulty:        2,
-  fencing_m:         400,
-  natural_regen_pct: 40,
-  esg_per_ha:        750,
-  hire_agent:        false,
-
-  // Advanced overrides (null = use base constant)
-  adv_yield:              null,  // → inputs.override_yield
-  adv_fencing_grant:      null,  // → inputs.override_fencing_grant
-  adv_restocking_grant:   null,  // → inputs.override_restocking_grant
-  adv_sitka_price:        null,  // patches constants
-  adv_scots_price:        null,  // patches constants (Scots Pine + Larch)
-  adv_trees_per_ha:       null,  // patches constants
-  adv_tree_cost:          null,  // patches constants
-  adv_agent_fee_pct:      null,  // patches constants (as %, converted to fraction)
-};
-
+let _state       = null;
 let _constants   = null;
 let _lastResults = null;
 let _activeTab   = 'contractor';
@@ -55,6 +46,8 @@ let _activeTab   = 'contractor';
 // ─────────────────────────────────────────────────
 
 const el = id => document.getElementById(id);
+
+const show = (id, visible) => { const e = el(id); if (e) e.hidden = !visible; };
 
 // ─────────────────────────────────────────────────
 // Formatters
@@ -73,122 +66,211 @@ function formatGBP(n) {
 // Alias used internally
 const fmt = formatGBP;
 
+const fmtM = m => Math.round(m).toLocaleString('en-GB') + ' m';
+
+function escapeHTML(s) {
+  return String(s).replace(/[&<>"']/g, ch => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;',
+  }[ch]));
+}
+
 // ─────────────────────────────────────────────────
-// Constants patching
+// Profile helpers
 // ─────────────────────────────────────────────────
 
-/** Deep-clones base constants and applies state-level overrides. */
-function patchConstants(state, base) {
-  const needsPatch = state.adv_sitka_price  != null
-    || state.adv_scots_price  != null
-    || state.adv_trees_per_ha != null
-    || state.adv_tree_cost    != null
-    || state.adv_agent_fee_pct != null;
+const profile  = () => getProfile(_constants, _state.project_type);
+const isLinear = () => profile().model === 'linear';
 
-  if (!needsPatch) return base;
+function overrideItem(kind) {
+  return (profile().grants ?? []).filter(g => g.override === kind);
+}
 
-  const c = JSON.parse(JSON.stringify(base));
+function rateFor(item) {
+  return item ? item.rate.split('.').reduce((o, k) => o?.[k], _constants) : null;
+}
 
-  if (state.adv_sitka_price != null)
-    c.timber.species.sitka_spruce.price_per_ton = state.adv_sitka_price;
+// ─────────────────────────────────────────────────
+// Project type selector + per-type form configuration
+// ─────────────────────────────────────────────────
 
-  if (state.adv_scots_price != null) {
-    c.timber.species.scots_pine.price_per_ton = state.adv_scots_price;
-    c.timber.species.larch.price_per_ton      = state.adv_scots_price;
+function buildTypeSelector() {
+  const wrap = el('type-selector');
+  if (!wrap) return;
+  wrap.textContent = '';
+  for (const type of PROJECT_TYPES) {
+    const p   = getProfile(_constants, type);
+    const btn = document.createElement('button');
+    btn.type      = 'button';
+    btn.className = 'type-option';
+    btn.dataset.type = type;
+    btn.setAttribute('role', 'radio');
+    btn.setAttribute('aria-checked', 'false');
+    const icon = document.createElement('span');
+    icon.className   = 'type-icon';
+    icon.textContent = p.icon ?? '🌳';
+    icon.setAttribute('aria-hidden', 'true');
+    const name = document.createElement('span');
+    name.className   = 'type-name';
+    name.textContent = p.label ?? type;
+    btn.append(icon, name);
+    btn.addEventListener('click', () => setProjectType(type));
+    wrap.appendChild(btn);
   }
 
-  if (state.adv_trees_per_ha != null)
-    c.costs.trees_per_ha    = state.adv_trees_per_ha;
-
-  if (state.adv_tree_cost != null)
-    c.costs.tree_cost_each  = state.adv_tree_cost;
-
-  if (state.adv_agent_fee_pct != null)
-    c.costs.agent_fee_pct   = state.adv_agent_fee_pct / 100;
-
-  return c;
+  // Radio-group keyboard behaviour: arrows move the selection
+  wrap.addEventListener('keydown', e => {
+    const keys = { ArrowRight: 1, ArrowDown: 1, ArrowLeft: -1, ArrowUp: -1 };
+    if (!(e.key in keys)) return;
+    e.preventDefault();
+    const idx  = PROJECT_TYPES.indexOf(_state.project_type);
+    const next = PROJECT_TYPES[(idx + keys[e.key] + PROJECT_TYPES.length) % PROJECT_TYPES.length];
+    setProjectType(next);
+    wrap.querySelector(`[data-type="${next}"]`)?.focus();
+  });
 }
 
-/** Builds the calc-facing inputs object from _state. */
-function buildInputs(state) {
-  return {
-    hectares:          state.hectares,
-    species:           state.species,
-    difficulty:        state.difficulty,
-    fencing_m:         state.fencing_m,
-    natural_regen_pct: state.natural_regen_pct,
-    esg_per_ha:        state.esg_per_ha,
-    hire_agent:        state.hire_agent,
-    override_yield:             state.adv_yield,
-    override_fencing_grant:     state.adv_fencing_grant,
-    override_restocking_grant:  state.adv_restocking_grant,
+function setProjectType(type) {
+  if (type === _state.project_type) return;
+  const keep = {
+    hire_agent:        _state.hire_agent,
+    adv_yield:         _state.adv_yield,
+    adv_sitka_price:   _state.adv_sitka_price,
+    adv_scots_price:   _state.adv_scots_price,
+    adv_agent_fee_pct: _state.adv_agent_fee_pct,
   };
-}
+  _state = { ...defaultState(type, _constants), ...keep };
 
-// ─────────────────────────────────────────────────
-// URL state encode / decode
-// ─────────────────────────────────────────────────
-
-function encodeURL(state) {
-  const p = new URLSearchParams();
-  p.set('ha',    state.hectares);
-  p.set('sp',    state.species);
-  p.set('diff',  state.difficulty);
-  p.set('fence', state.fencing_m);
-  p.set('regen', state.natural_regen_pct);
-  p.set('esg',   state.esg_per_ha);
-  p.set('agent', state.hire_agent ? '1' : '0');
-
-  // Only encode non-null overrides
-  const enc = (key, val) => { if (val != null) p.set(key, val); };
-  enc('yield', state.adv_yield);
-  enc('fg',    state.adv_fencing_grant);
-  enc('rg',    state.adv_restocking_grant);
-  enc('sitka', state.adv_sitka_price);
-  enc('scots', state.adv_scots_price);
-  enc('tph',   state.adv_trees_per_ha);
-  enc('tc',    state.adv_tree_cost);
-  enc('af',    state.adv_agent_fee_pct);
-
-  history.replaceState(null, '', '?' + p.toString());
-}
-
-// FIX [3 malformed-URL]: valid species keys — anything else falls back to default
-const VALID_SPECIES = new Set(['sitka_spruce', 'scots_pine', 'larch', 'mixed_conifer']);
-
-function decodeURL() {
-  const p = new URLSearchParams(window.location.search);
-  if (!p.has('ha')) return null;
-
-  const pn    = (k, d) => { const v = parseFloat(p.get(k)); return isNaN(v) ? d : v; };
-  const pi    = (k, d) => { const v = parseInt(p.get(k), 10); return isNaN(v) ? d : v; };
-  const pN    = (k)    => { const v = parseFloat(p.get(k)); return isNaN(v) ? null : v; };
-  const clamp = (v, lo, hi) => Math.min(Math.max(v, lo), hi);
-
-  const sp  = p.get('sp') || 'sitka_spruce';
-
-  return {
-    // FIX [3 malformed-URL]: clamp all numeric params to valid ranges
-    hectares:          clamp(pn('ha',    4),   0.5, 20),
-    species:           VALID_SPECIES.has(sp) ? sp : 'sitka_spruce',
-    difficulty:        clamp(pi('diff',  2),   1,   5),
-    fencing_m:         clamp(pi('fence', 400), 0,   3000),
-    natural_regen_pct: clamp(pi('regen', 40),  0,   100),
-    esg_per_ha:        clamp(pi('esg',   750), 0,   2500),
-    hire_agent:        p.get('agent') === '1',
-    adv_yield:              pN('yield'),
-    adv_fencing_grant:      pN('fg'),
-    adv_restocking_grant:   pN('rg'),
-    adv_sitka_price:        pN('sitka'),
-    adv_scots_price:        pN('scots'),
-    adv_trees_per_ha:       pN('tph'),
-    adv_tree_cost:          pN('tc'),
-    adv_agent_fee_pct:      pN('af'),
+  const advIds = {
+    adv_fencing_grant: 'adv-fencing-grant', adv_restocking_grant: 'adv-restocking-grant',
+    adv_trees_per_ha:  'adv-trees-per-ha',  adv_tree_cost:        'adv-tree-cost',
   };
+  TYPE_SPECIFIC_ADV_KEYS.forEach(k => { const e = el(advIds[k]); if (e) e.value = ''; });
+
+  configureForType();
+  applyStateToDOM(_state);
+  populateAdvancedFields(_constants);
+  runCalculation();
+}
+
+function populateSpecies(p) {
+  const sel = el('input-species');
+  if (!sel) return;
+  sel.textContent = '';
+  for (const [key, sp] of Object.entries(p.species ?? {})) {
+    const opt = document.createElement('option');
+    opt.value       = key;
+    opt.textContent = sp.label;
+    sel.appendChild(opt);
+  }
+  const label = el('species-label');
+  if (label) label.textContent = p.species_label ?? 'Species';
+}
+
+function renumberSections() {
+  let n = 0;
+  document.querySelectorAll('.panel-controls .input-section').forEach(section => {
+    if (section.hidden) return;
+    n += 1;
+    const num = section.querySelector('.section-number');
+    if (num) num.textContent = String(n).padStart(2, '0');
+  });
+}
+
+/** Static per-type layout: which blocks exist, labels, species list. */
+function configureForType() {
+  const p      = profile();
+  const linear = isLinear();
+  const s      = p.sections ?? {};
+
+  document.querySelectorAll('.type-option').forEach(btn => {
+    const on = btn.dataset.type === _state.project_type;
+    btn.setAttribute('aria-checked', String(on));
+    btn.tabIndex = on ? 0 : -1;
+  });
+  const desc = el('type-description');
+  if (desc) desc.textContent = p.description ?? '';
+
+  // 01 Size + species
+  el('title-woodland').textContent = linear ? 'Your Hedge' : 'Your Woodland';
+  show('block-area-size',   !linear);
+  show('block-linear-size',  linear);
+  show('block-density',     !linear && s.density === true);
+  populateSpecies(p);
+
+  // 02 Harvest
+  const timberPossible = !linear && (p.timber_enabled || p.timber_optional);
+  show('section-harvest',     timberPossible);
+  show('block-timber-toggle', timberPossible && !p.timber_enabled);
+
+  // 03 Fencing
+  const stock = linear || p.fence_type === 'stock';
+  el('title-fencing').textContent = stock ? 'Stock Fencing' : 'Deer Fencing';
+  el('no-fence-label').textContent = stock
+    ? 'No stock fencing needed'
+    : 'No deer pressure — fencing not needed';
+  show('block-area-fence',   !linear);
+  show('block-linear-fence',  linear);
+  const hasFenceGrant = (p.grants ?? []).some(g => g.role === 'fencing');
+  const note = el('fence-note');
+  if (note) {
+    note.hidden      = hasFenceGrant;
+    note.textContent = hasFenceGrant ? '' : 'No fencing grant for this project type — the grant rate already covers tree protection, so any fence here is a cost only.';
+  }
+
+  // 04 Regeneration / restoration works / hedge works
+  const showRegen = !linear && s.regen !== false;
+  const showRhodo = !linear && s.rhodo !== false;
+  show('section-regen', linear || showRegen || showRhodo);
+  el('title-regen').textContent = linear ? 'Hedge Works' : (showRegen ? 'Regeneration Strategy' : 'Restoration Works');
+  show('block-regen',       showRegen);
+  show('block-rhodo',       showRhodo);
+  show('block-hedge-works', linear);
+  el('block-rhodo')?.classList.toggle('mt-12', showRegen);
+  el('rhodo-label').textContent = p.rhodo_label ?? 'Rhododendron / invasive clearance';
+
+  // 05 Funding
+  show('block-esg-ha', !linear);
+  show('block-esg-m',   linear);
+
+  // Advanced settings
+  show('adv-group-timber', timberPossible);
+  const pawsPrices = _state.project_type === 'paws';
+  ['adv-sitka-price', 'adv-scots-price'].forEach(id => {
+    const field = el(id)?.closest('.advanced-field');
+    if (field) field.hidden = !pawsPrices;
+  });
+  el('adv-grants-label').textContent = `${p.grant_scheme ?? 'FGS'} Grants`;
+
+  const fenceItem = overrideItem('fencing')[0];
+  show('adv-field-fencing-grant', !!fenceItem);
+  if (fenceItem) {
+    const r = rateFor(fenceItem);
+    el('adv-fencing-grant-label').textContent = `${r?.label ?? 'Fencing grant'} (${r?.unit ?? '£/m'})`;
+  }
+  const estItems = overrideItem('establishment');
+  show('adv-field-restocking-grant', estItems.length > 0);
+  if (estItems.length) {
+    const r = rateFor(estItems[0]);
+    el('adv-restocking-grant-label').textContent = estItems.length > 1
+      ? `Establishment grant (${r?.unit ?? '£/ha'})`
+      : `${r?.label ?? 'Establishment grant'} (${r?.unit ?? '£/ha'})`;
+  }
+  show('adv-field-trees', !linear);
+  el('adv-tree-cost-label').textContent = linear ? 'Plant cost each, contractor (£)' : 'Tree cost each (£)';
+
+  // Results copy
+  el('projection-title').textContent = linear
+    ? '15-Year Hedgerow Value Projection'
+    : '15-Year Woodland Value Projection';
+  el('projection-helper').textContent = _state.project_type === 'paws'
+    ? 'What your restored broadleaf woodland earns once the canopy establishes. Hover over the chart for year-by-year detail.'
+    : 'Annual value once established, plus any multi-year maintenance or management grants. Hover over the chart for year-by-year detail.';
+
+  renumberSections();
 }
 
 // ─────────────────────────────────────────────────
-// Apply state → DOM inputs (used on init / URL restore)
+// Apply state → DOM inputs (used on init / URL restore / type change)
 // ─────────────────────────────────────────────────
 
 function applyStateToDOM(s) {
@@ -203,6 +285,23 @@ function applyStateToDOM(s) {
   set('input-regen',      s.natural_regen_pct);
   set('input-esg',        s.esg_per_ha);
   chk('input-agent',      s.hire_agent);
+  chk('input-timber',     s.timber_enabled);
+  chk('input-rhodo',      s.rhodo_enabled);
+  set('input-rhodo-pct',  s.rhodo_pct);
+
+  set('input-length',      s.length_m);
+  set('input-length-num',  s.length_m);
+  set('input-hedge-mode',  s.hedge_mode);
+  set('input-gap',         s.gap_pct);
+  set('input-ppm',         s.plants_per_m);
+  set('input-lay',         s.lay_m);
+  set('input-coppice',     s.coppice_m);
+  set('input-stock-fence', s.stock_fence_m);
+  set('input-guards',      s.guards);
+  set('input-esg-m',       s.esg_per_m);
+
+  const density = s.adv_trees_per_ha ?? effectiveCosts(_constants, profile()).trees_per_ha;
+  set('input-density', density);
 
   const noFence = s.fencing_m === 0;
   chk('input-no-fence', noFence);
@@ -211,34 +310,51 @@ function applyStateToDOM(s) {
   if (row)    row.style.opacity = noFence ? '0.35' : '1';
   if (slider) slider.disabled  = noFence;
 
-  // Advanced overrides — only set if non-null (blank = use default)
-  // Only write to the DOM if we have an actual override — leave blank fields
-  // untouched so populateAdvancedFields can fill them with constant defaults.
+  // Advanced overrides — only write actual overrides; blank fields are filled
+  // with constant defaults by populateAdvancedFields.
   const setIfSet = (id, v) => { const e = el(id); if (e && v != null) e.value = v; };
-  setIfSet('adv-yield',           s.adv_yield);
-  setIfSet('adv-fencing-grant',   s.adv_fencing_grant);
+  setIfSet('adv-yield',            s.adv_yield);
+  setIfSet('adv-fencing-grant',    s.adv_fencing_grant);
   setIfSet('adv-restocking-grant', s.adv_restocking_grant);
-  setIfSet('adv-sitka-price',     s.adv_sitka_price);
-  setIfSet('adv-scots-price',     s.adv_scots_price);
-  setIfSet('adv-trees-per-ha',    s.adv_trees_per_ha);
-  setIfSet('adv-tree-cost',       s.adv_tree_cost);
-  setIfSet('adv-agent-fee',       s.adv_agent_fee_pct);
+  setIfSet('adv-sitka-price',      s.adv_sitka_price);
+  setIfSet('adv-scots-price',      s.adv_scots_price);
+  setIfSet('adv-trees-per-ha',     s.adv_trees_per_ha);
+  setIfSet('adv-tree-cost',        s.adv_tree_cost);
+  setIfSet('adv-agent-fee',        s.adv_agent_fee_pct);
 }
 
 // ─────────────────────────────────────────────────
 // Populate Advanced Settings from loaded constants
 // ─────────────────────────────────────────────────
 
+function establishmentDefault(c) {
+  const items = overrideItem('establishment');
+  const tph   = effectiveCosts(c, profile()).trees_per_ha;
+  const item  = items.find(g => !g.when || (tph >= (g.when.tph_min ?? -Infinity) && tph <= (g.when.tph_max ?? Infinity))) ?? items[0];
+  return item ? rateValue(rateFor(item)) : null;
+}
+
 function populateAdvancedFields(c) {
+  const p     = profile();
+  const costs = effectiveCosts(c, p);
   const set = (id, v) => { const e = el(id); if (e && v != null && e.value === '') e.value = v; };
-  set('adv-yield',             c.timber?.yield_tons_per_ha);
-  set('adv-sitka-price',       c.timber?.species?.sitka_spruce?.price_per_ton);
-  set('adv-scots-price',       c.timber?.species?.scots_pine?.price_per_ton);
-  set('adv-fencing-grant',     c.fgs_grants?.deer_fencing_grant_per_m);
-  set('adv-restocking-grant',  c.fgs_grants?.restocking_grant_per_ha);
-  set('adv-trees-per-ha',      c.costs?.trees_per_ha);
-  set('adv-tree-cost',         c.costs?.tree_cost_each);
-  set('adv-agent-fee',         (c.costs?.agent_fee_pct ?? 0.12) * 100);
+  set('adv-yield',            p.timber_yield_t_per_ha ?? c.timber?.yield_tons_per_ha);
+  set('adv-sitka-price',      c.timber?.species?.sitka_spruce?.price_per_ton);
+  set('adv-scots-price',      c.timber?.species?.scots_pine?.price_per_ton);
+  set('adv-fencing-grant',    rateValue(rateFor(overrideItem('fencing')[0])) || null);
+  set('adv-restocking-grant', establishmentDefault(c));
+  set('adv-trees-per-ha',     costs.trees_per_ha);
+  set('adv-tree-cost',        isLinear() ? costs.plant_contractor_each : costs.tree_cost_each);
+  set('adv-agent-fee',        (c.costs?.agent_fee_pct ?? 0.12) * 100);
+}
+
+// ─────────────────────────────────────────────────
+// Debounce utility
+// ─────────────────────────────────────────────────
+
+function debounce(fn, ms) {
+  let t;
+  return (...args) => { clearTimeout(t); t = setTimeout(() => fn(...args), ms); };
 }
 
 // ─────────────────────────────────────────────────
@@ -247,15 +363,23 @@ function populateAdvancedFields(c) {
 
 function updateLiveLabels(s) {
   const set = (id, v) => { const e = el(id); if (e) e.textContent = v; };
+  const p   = profile();
 
   // Size
   set('val-size', s.hectares.toFixed(1) + ' ha');
 
+  // Agroforestry density
+  const tph = s.adv_trees_per_ha ?? effectiveCosts(_constants, p).trees_per_ha;
+  set('val-density', tph + ' trees/ha');
+
   // Species chip
   const chip = el('species-chip');
-  if (chip) chip.textContent = speciesIcon(s.species) + ' ' + speciesLabel(s.species);
+  const sp   = p.species?.[s.species];
+  if (chip) chip.textContent = `${sp?.icon ?? '🌳'} ${sp?.label ?? s.species}`;
 
-  // Difficulty
+  // Timber / difficulty
+  const timberOn = p.timber_enabled || (p.timber_optional && s.timber_enabled);
+  show('block-difficulty', !!timberOn);
   set('val-difficulty', s.difficulty);
   const badge = el('difficulty-badge');
   if (badge) {
@@ -276,15 +400,48 @@ function updateLiveLabels(s) {
   set('regen-chip',    s.natural_regen_pct + '% natural regen');
   set('planting-chip', (100 - s.natural_regen_pct) + '% active planting');
 
+  // Rhododendron / invasives
+  set('val-rhodo-pct', s.rhodo_pct + '%');
+  const rhodoRow = el('rhodo-slider-row');
+  if (rhodoRow) rhodoRow.style.opacity = s.rhodo_enabled ? '1' : '0.35';
+  const rhodoSlider = el('input-rhodo-pct');
+  if (rhodoSlider) rhodoSlider.disabled = !s.rhodo_enabled;
+
+  // Hedgerow
+  const create   = s.hedge_mode === 'create';
+  const gapPct   = create ? 100 : s.gap_pct;
+  const plantM   = s.length_m * gapPct / 100;
+  const existing = s.length_m - plantM;
+  set('val-length', fmtM(s.length_m));
+  set('val-gap',    gapPct + '%');
+  show('gap-row', !create);
+  set('plant-chip',  fmtM(plantM) + ' to plant');
+  set('plants-chip', Math.round(plantM * s.plants_per_m).toLocaleString('en-GB') + ' plants');
+  ['input-lay', 'input-coppice'].forEach(id => {
+    const e = el(id);
+    if (!e) return;
+    e.max      = Math.max(existing, 0);
+    e.disabled = create;
+  });
+  const layEff     = create ? 0 : Math.min(s.lay_m, existing);
+  const coppiceEff = create ? 0 : Math.min(s.coppice_m, Math.max(existing - layEff, 0));
+  set('val-lay',         fmtM(layEff));
+  set('val-coppice',     fmtM(coppiceEff));
+  set('hedge-works-note', create
+    ? 'Laying and coppicing apply to existing hedges only.'
+    : `Laying and coppicing apply to the existing hedge (${fmtM(existing)}), not the gaps.`);
+  set('val-stock-fence', fmtM(s.stock_fence_m));
+
   // ESG
-  set('val-esg', '£' + s.esg_per_ha.toLocaleString('en-GB') + '/ha');
+  set('val-esg',   '£' + s.esg_per_ha.toLocaleString('en-GB') + '/ha');
+  set('val-esg-m', '£' + s.esg_per_m.toFixed(2) + '/m');
 
   // Agent toggle labels
   el('label-diy')?.classList.toggle('active', !s.hire_agent);
   el('label-agent')?.classList.toggle('active', s.hire_agent);
   el('agent-fee-notice')?.classList.toggle('visible', s.hire_agent);
 
-  // Sister tool nudge — show once a calculation is in progress, with live ha
+  // Sister tool nudge — show once a calculation is in progress, with live size
   const nudge   = el('sister-nudge');
   const nudgeHa = el('nudge-hectares');
   if (nudge)   nudge.style.display = 'block';
@@ -305,6 +462,7 @@ const BREAKEVEN_COPY = {
 export function renderResults(r) {
   _lastResults = r;
   renderHero(r, _activeTab);
+  renderNotices(r);
   renderBreakdown(r);
   renderFundingMix(r);
   renderSweatEquity(r);
@@ -334,7 +492,10 @@ function renderHero(r, tab) {
   if (bkWrap) {
     // FIX [T3-B]: breakeven text comes from a hardcoded lookup table (not user data),
     // but we still use createElement + textContent as a defence-in-depth practice.
-    const bk   = BREAKEVEN_COPY[r.breakeven_status] ?? BREAKEVEN_COPY.DEFICIT;
+    let bk = BREAKEVEN_COPY[r.breakeven_status] ?? BREAKEVEN_COPY.DEFICIT;
+    if (r.breakeven_status === 'POSITIVE' && !r.timber_enabled) {
+      bk = { ...bk, text: 'No net cost before grants' };
+    }
     bkWrap.textContent = '';
     const badge = document.createElement('span');
     badge.className   = `breakeven-badge ${bk.cls}`;
@@ -343,10 +504,58 @@ function renderHero(r, tab) {
   }
 
   const subEl = el('hero-sub');
-  if (subEl) subEl.textContent = `${r.species_label} · ${r.difficulty_label} · ${r.hectares} ha`;
+  if (subEl) subEl.textContent = r.summary_label;
 
   el('tab-contractor')?.classList.toggle('active', tab === 'contractor');
   el('tab-diy')?.classList.toggle('active', tab === 'diy');
+}
+
+// ── Eligibility notices ──────────────────────────
+
+function eligibilityNotices(r, s) {
+  const notes = [];
+  if (r.project_type === 'hedgerow') {
+    const q = r.quantities;
+    if (q.plant_m > 0 && s.plants_per_m < 6) {
+      notes.push('AECS hedge planting needs a double row of at least 6 plants/m — the planting grant is excluded at this density.');
+    }
+    if (q.plant_m > 0 && s.guards === 'none' && s.stock_fence_m === 0) {
+      notes.push('AECS hedge planting must be combined with a stock fence or guards (an existing stock-proof fence also counts).');
+    }
+    if (s.hedge_mode === 'create') {
+      notes.push('AECS Creation of Hedgerows is only available inside its target area — check the AECS targeting tool.');
+    }
+    if (s.hedge_mode !== 'create' && (s.lay_m > q.lay_m || s.coppice_m > q.coppice_m)) {
+      notes.push(`Laying and coppicing are capped at the existing hedge length (${fmtM(q.existing_m)}).`);
+    }
+    if (s.species === 'beech') {
+      notes.push('Single-species beech hedges need prior AECS approval.');
+    }
+  }
+  if (r.project_type === 'agroforestry') {
+    const tph = s.adv_trees_per_ha ?? effectiveCosts(_constants, profile()).trees_per_ha;
+    if (tph < 150 || tph > 400) {
+      notes.push('FGS Agroforestry pays at 150–200 or 300–400 trees/ha — no establishment grant at this density.');
+    } else if (tph > 200 && tph < 300) {
+      notes.push('Between 200 and 300 trees/ha is paid at the lower (150–200 trees/ha) agroforestry rate.');
+    }
+    if (s.hectares > 15) {
+      notes.push('FGS Agroforestry is capped at 15 ha per farm business.');
+    }
+  }
+  return notes;
+}
+
+function renderNotices(r) {
+  const wrap = el('result-notices');
+  if (!wrap) return;
+  wrap.textContent = '';
+  for (const text of eligibilityNotices(r, _state)) {
+    const div = document.createElement('div');
+    div.className   = 'result-notice';
+    div.textContent = '⚠ ' + text;
+    wrap.appendChild(div);
+  }
 }
 
 // ── Section 1: Breakdown table ───────────────────
@@ -355,17 +564,31 @@ function renderBreakdown(r) {
   const wrap = el('net-breakdown');
   if (!wrap) return;
 
+  // Labels come from bundled constants and are escaped; values are fmt()-formatted numbers.
   const row = (label, value, color) => `
     <tr>
-      <td>${label}</td>
+      <td>${escapeHTML(label)}</td>
       <td class="val" style="color:${color};">${fmt(value)}</td>
     </tr>`;
 
   const sub = (label, value) => `
     <tr class="sub-row">
-      <td>↳ ${label}</td>
+      <td>↳ ${escapeHTML(label)}</td>
       <td class="val">${fmt(value)}</td>
     </tr>`;
+
+  const annualRows = r.annual_grant_items.map(g => `
+    <tr class="sub-row">
+      <td>↳ ${escapeHTML(g.label)} <span class="text-muted">— ${fmt(g.amount)}/yr, in projection</span></td>
+      <td class="val text-muted">—</td>
+    </tr>`).join('');
+
+  const linear     = r.model === 'linear';
+  const costRows   = r.cost_items
+    .filter(i => i.contractor > 0 || (!linear && (i.key === 'fencing' || i.key === 'planting')) || (linear && i.key === 'planting'))
+    .map(i => row(i.label, -i.contractor, 'var(--c-ink)'))
+    .join('');
+  const agentLabel = 'Forestry agent fee (12%)';
 
   wrap.innerHTML = `
     <table class="breakdown-table">
@@ -373,13 +596,11 @@ function renderBreakdown(r) {
         <tr class="income-header">
           <td colspan="2">Income</td>
         </tr>
-        ${row('Timber sale', r.timber_revenue, r.timber_revenue >= 0 ? 'var(--c-positive)' : 'var(--c-negative)')}
-        ${row('FGS grants total', r.fgs_total, 'var(--c-positive)')}
-        ${sub('Deer fencing grant',        r.fgs_breakdown.fencing_grant)}
-        ${sub('Tree protection (stakes)',   r.fgs_breakdown.tree_protection_grant)}
-        ${sub('Restocking grant',          r.fgs_breakdown.restocking_grant)}
-        ${sub('Rhododendron clearance',    r.fgs_breakdown.rhododendron_grant)}
-        ${row('ESG / private BNG', r.esg_income, 'var(--c-positive)')}
+        ${r.timber_enabled ? row('Timber sale', r.timber_revenue, r.timber_revenue >= 0 ? 'var(--c-positive)' : 'var(--c-negative)') : ''}
+        ${row(`${r.grant_scheme} grants total`, r.fgs_total, 'var(--c-positive)')}
+        ${r.grant_items.map(g => sub(g.label, g.amount)).join('')}
+        ${annualRows}
+        ${row(linear ? 'Private sponsorship' : 'ESG / private BNG', r.esg_income, 'var(--c-positive)')}
         <tr class="subtotal-row">
           <td>Gross inflow</td>
           <td class="val">${fmt(r.gross_inflow)}</td>
@@ -387,9 +608,8 @@ function renderBreakdown(r) {
         <tr class="cost-header">
           <td colspan="2">Costs — Contractor scenario</td>
         </tr>
-        ${row('Deer fencing (installed)',   -r.contractor_fencing,  'var(--c-ink)')}
-        ${row('Planting (supply + labour)', -r.contractor_planting, 'var(--c-ink)')}
-        ${r.agent_fee > 0 ? row('Forestry agent fee (12%)', -r.agent_fee, 'var(--c-negative)') : ''}
+        ${costRows}
+        ${r.agent_fee > 0 ? row(agentLabel, -r.agent_fee, 'var(--c-negative)') : ''}
         <tr class="subtotal-row" style="background:rgba(155,34,38,.04);">
           <td>Gross outflow</td>
           <td class="val">${fmt(-r.gross_outflow_contractor)}</td>
@@ -432,14 +652,15 @@ function renderFundingMix(r) {
   if (rowsEl) {
     rowsEl.style.display = 'block';
     const items = [
-      { label: 'Timber revenue',  value: r.timber_revenue, color: CHART_COLORS.timber, pct: timber_pct },
-      { label: 'FGS grants',      value: r.fgs_total,      color: CHART_COLORS.fgs,    pct: fgs_pct    },
-      { label: 'ESG sponsorship', value: r.esg_income,     color: CHART_COLORS.esg,    pct: esg_pct    },
+      { label: 'Timber revenue',            value: r.timber_revenue, color: CHART_COLORS.timber, pct: timber_pct },
+      { label: `${r.grant_scheme} grants`,  value: r.fgs_total,      color: CHART_COLORS.fgs,    pct: fgs_pct    },
+      { label: r.model === 'linear' ? 'Private sponsorship' : 'ESG sponsorship',
+        value: r.esg_income,     color: CHART_COLORS.esg,    pct: esg_pct    },
     ].filter(i => i.value > 0);
 
     // FIX [T3-C]: when timber revenue is negative (high difficulty), show a muted
     // notice rather than a negative bar or silent omission.
-    const timberNotice = r.timber_revenue < 0
+    const timberNotice = r.timber_enabled && r.timber_revenue < 0
       ? `<div class="funding-timber-negative">
            ⚠ Timber revenue: ${fmt(r.timber_revenue)} — extraction costs exceed sale value at this difficulty.
            Grant funding is carrying the project.
@@ -469,6 +690,8 @@ function renderFundingMix(r) {
       { label: 'ESG',    value: r.esg_income,                  color: CHART_COLORS.esg    },
     ].filter(s => s.value > 0),
     `${fmt(r.gross_inflow)}\nGross inflow`);
+  } else if (donutWrap) {
+    donutWrap.style.display = 'none';
   }
 }
 
@@ -484,9 +707,11 @@ function renderSweatEquity(r) {
   compareEl.style.display = 'block';
   totalEl.style.display   = 'block';
 
-  const maxCost = Math.max(
-    r.contractor_fencing, r.diy_fencing,
-    r.contractor_planting, r.diy_planting, 1);
+  const linear = r.model === 'linear';
+  const items  = r.cost_items.filter(i =>
+    i.contractor > 0 || (!linear && (i.key === 'fencing' || i.key === 'planting')));
+
+  const maxCost = Math.max(1, ...items.flatMap(i => [i.contractor, i.diy]));
 
   const pct   = v => Math.round((v / maxCost) * 100);
   const block = (label, cVal, dVal) => {
@@ -494,7 +719,7 @@ function renderSweatEquity(r) {
     const savePct = cVal > 0 ? Math.round((saving / cVal) * 100) : 0;
     return `
       <div class="compare-block">
-        <div class="compare-block-label">${label}</div>
+        <div class="compare-block-label">${escapeHTML(label)}</div>
         <div class="compare-bar-item">
           <span class="compare-bar-name">Contractor</span>
           <div class="compare-bar-track">
@@ -520,9 +745,9 @@ function renderSweatEquity(r) {
       </div>`;
   };
 
-  compareEl.innerHTML =
-    block('Deer Fencing', r.contractor_fencing,  r.diy_fencing)
-  + block('Planting',     r.contractor_planting, r.diy_planting);
+  compareEl.innerHTML = items.length
+    ? items.map(i => block(i.compare_label ?? i.label, i.contractor, i.diy)).join('')
+    : '<p class="helper-text">No works costed yet.</p>';
 
   const totalSaving = r.sweat_equity_saving;
   const savePct     = r.contractor_total > 0
@@ -563,15 +788,21 @@ function renderProjection(r) {
 
   const years   = r.projection;
   const xLabels = years.map(yr => `Yr${yr.year}`);
+  const labels  = r.stream_labels ?? {};
 
-  lineChart('chart-projection', xLabels, [
-    { label: 'Firewood / Biomass',  color: CHART_COLORS.timber, values: years.map(y => y.firewood)        },
-    { label: 'Sporting Rights',     color: CHART_COLORS.fgs,    values: years.map(y => y.sporting)        },
-    { label: 'Natural Capital',     color: CHART_COLORS.sweat,  values: years.map(y => y.natural_capital) },
-    { label: 'BNG Credits',         color: CHART_COLORS.esg,    values: years.map(y => y.bng)             },
-  ], 'legend-projection');
+  const datasets = [
+    { label: labels.firewood ?? 'Firewood / Biomass', color: CHART_COLORS.timber, values: years.map(y => y.firewood)        },
+    { label: labels.sporting ?? 'Sporting Rights',    color: CHART_COLORS.fgs,    values: years.map(y => y.sporting)        },
+    { label: 'Natural Capital',                       color: CHART_COLORS.sweat,  values: years.map(y => y.natural_capital) },
+    { label: 'BNG Credits',                           color: CHART_COLORS.esg,    values: years.map(y => y.bng)             },
+  ];
+  if (years.some(y => y.annual_grants > 0)) {
+    datasets.push({ label: `${r.grant_scheme} annual grants`, color: CHART_COLORS.annual_grants, values: years.map(y => y.annual_grants) });
+  }
+  lineChart('chart-projection', xLabels, datasets, 'legend-projection');
 
-  const yr15 = years[14];
+  const yr15      = years[14];
+  const firstYear = years.find(y => y.total > 0)?.year;
   statsEl.innerHTML = `
     <div class="stat-boxes">
       <div class="stat-box">
@@ -584,7 +815,7 @@ function renderProjection(r) {
       </div>
       <div class="stat-box">
         <div class="stat-box-label">First income year</div>
-        <div class="stat-box-value" style="color:var(--c-gold);font-size:1rem;">Year 4</div>
+        <div class="stat-box-value" style="color:var(--c-gold);font-size:1rem;">${firstYear ? 'Year ' + firstYear : '—'}</div>
       </div>
     </div>`;
 }
@@ -594,22 +825,13 @@ function renderProjection(r) {
 // ─────────────────────────────────────────────────
 
 function runCalculation() {
-  if (!_constants) return;
+  if (!_constants || !_state) return;
   updateLiveLabels(_state);
   const inputs    = buildInputs(_state);
   const constants = patchConstants(_state, _constants);
   const results   = calculate(inputs, constants);
   renderResults(results);
-  encodeURL(_state);
-}
-
-// ─────────────────────────────────────────────────
-// Debounce utility
-// ─────────────────────────────────────────────────
-
-function debounce(fn, ms) {
-  let t;
-  return (...args) => { clearTimeout(t); t = setTimeout(() => fn(...args), ms); };
+  history.replaceState(null, '', '?' + encodeState(_state));
 }
 
 // ─────────────────────────────────────────────────
@@ -646,49 +868,88 @@ function initCollapsibles() {
 // Event wiring — all inputs update _state then recalc
 // ─────────────────────────────────────────────────
 
-function initInputEvents() {
-  // Site size slider
-  el('input-size')?.addEventListener('input', () => {
-    _state.hectares = parseFloat(el('input-size').value) || 4;
-    el('input-size-num').value = _state.hectares;
+/** Wires a slider/select/number input to a state key with a parser. */
+function bind(id, key, parse, event = 'input') {
+  el(id)?.addEventListener(event, () => {
+    _state[key] = parse(el(id).value);
+    runCalculation();
+  });
+}
+
+const toInt   = d => v => { const n = parseInt(v, 10); return isNaN(n) ? d : n; };
+const toFloat = d => v => { const n = parseFloat(v);   return isNaN(n) ? d : n; };
+
+/** Paired range + number inputs with validation on the number field. */
+function bindPaired(rangeId, numId, key, lo, hi, fallback, unitMsg) {
+  el(rangeId)?.addEventListener('input', () => {
+    _state[key] = parseFloat(el(rangeId).value) || fallback;
+    el(numId).value = _state[key];
     runCalculation();
   });
 
-  // FIX [3 validation]: reject 0 or negative in number input; revert on blur
-  el('input-size-num')?.addEventListener('input', () => {
-    const v = parseFloat(el('input-size-num').value);
-    if (!isNaN(v) && v >= 0.5 && v <= 20) {
-      _state.hectares = v;
-      el('input-size').value = v;
-      el('input-size-num').setCustomValidity('');
+  // FIX [3 validation]: reject out-of-range values in number input; revert on blur
+  el(numId)?.addEventListener('input', () => {
+    const v = parseFloat(el(numId).value);
+    if (!isNaN(v) && v >= lo && v <= hi) {
+      _state[key] = v;
+      el(rangeId).value = v;
+      el(numId).setCustomValidity('');
       runCalculation();
     } else {
-      el('input-size-num').setCustomValidity('Enter a value between 0.5 and 20 hectares');
+      el(numId).setCustomValidity(unitMsg);
     }
   });
-  el('input-size-num')?.addEventListener('blur', () => {
-    const v = parseFloat(el('input-size-num').value);
-    if (isNaN(v) || v < 0.5 || v > 20) {
-      el('input-size-num').value = _state.hectares;
-      el('input-size-num').setCustomValidity('');
+  el(numId)?.addEventListener('blur', () => {
+    const v = parseFloat(el(numId).value);
+    if (isNaN(v) || v < lo || v > hi) {
+      el(numId).value = _state[key];
+      el(numId).setCustomValidity('');
     }
+  });
+}
+
+function initInputEvents() {
+  bindPaired('input-size',   'input-size-num',   'hectares', 0.5, 20,   4,   'Enter a value between 0.5 and 20 hectares');
+  bindPaired('input-length', 'input-length-num', 'length_m', 0,   5000, 0,   'Enter a value between 0 and 5,000 metres');
+
+  bind('input-species',     'species',           v => v, 'change');
+  bind('input-difficulty',  'difficulty',        toInt(2));
+  bind('input-perimeter',   'fencing_m',         toInt(0));
+  bind('input-regen',       'natural_regen_pct', toInt(0));
+  bind('input-esg',         'esg_per_ha',        toInt(0));
+  bind('input-esg-m',       'esg_per_m',         toFloat(0));
+  bind('input-rhodo-pct',   'rhodo_pct',         toInt(0));
+  bind('input-hedge-mode',  'hedge_mode',        v => (v === 'create' ? 'create' : 'restore'), 'change');
+  bind('input-gap',         'gap_pct',           toInt(0));
+  bind('input-lay',         'lay_m',             toInt(0));
+  bind('input-coppice',     'coppice_m',         toInt(0));
+  bind('input-stock-fence', 'stock_fence_m',     toInt(0));
+  bind('input-guards',      'guards',            v => v, 'change');
+
+  el('input-ppm')?.addEventListener('input', () => {
+    const v = parseFloat(el('input-ppm').value);
+    if (!isNaN(v) && v >= 1 && v <= 10) { _state.plants_per_m = v; runCalculation(); }
   });
 
-  // Species dropdown
-  el('input-species')?.addEventListener('change', () => {
-    _state.species = el('input-species').value;
+  el('input-timber')?.addEventListener('change', () => {
+    _state.timber_enabled = el('input-timber').checked;
     runCalculation();
   });
 
-  // Difficulty slider
-  el('input-difficulty')?.addEventListener('input', () => {
-    _state.difficulty = parseInt(el('input-difficulty').value, 10);
+  el('input-rhodo')?.addEventListener('change', () => {
+    _state.rhodo_enabled = el('input-rhodo').checked;
     runCalculation();
   });
 
-  // Fencing perimeter slider
-  el('input-perimeter')?.addEventListener('input', () => {
-    _state.fencing_m = parseInt(el('input-perimeter').value, 10) || 0;
+  // Agroforestry density drives the trees/ha override (and the grant tier)
+  el('input-density')?.addEventListener('input', () => {
+    _state.adv_trees_per_ha = parseInt(el('input-density').value, 10) || null;
+    const adv = el('adv-trees-per-ha');
+    if (adv) adv.value = _state.adv_trees_per_ha ?? '';
+    if (_state.adv_restocking_grant == null) {
+      const rg = el('adv-restocking-grant');
+      if (rg) { rg.value = ''; populateAdvancedFields(_constants); }
+    }
     runCalculation();
   });
 
@@ -700,18 +961,6 @@ function initInputEvents() {
     const slider = el('input-perimeter');
     if (row)    row.style.opacity = checked ? '0.35' : '1';
     if (slider) slider.disabled  = checked;
-    runCalculation();
-  });
-
-  // Natural regen slider
-  el('input-regen')?.addEventListener('input', () => {
-    _state.natural_regen_pct = parseInt(el('input-regen').value, 10) || 0;
-    runCalculation();
-  });
-
-  // ESG slider
-  el('input-esg')?.addEventListener('input', () => {
-    _state.esg_per_ha = parseInt(el('input-esg').value, 10) || 0;
     runCalculation();
   });
 
@@ -737,6 +986,10 @@ function initInputEvents() {
     el(id)?.addEventListener('input', () => {
       const v = parseFloat(el(id).value);
       _state[key] = isNaN(v) ? null : v;
+      if (key === 'adv_trees_per_ha' && _state.adv_trees_per_ha != null) {
+        const d = el('input-density');
+        if (d) d.value = _state.adv_trees_per_ha;
+      }
       dCalc();
     });
   });
@@ -756,6 +1009,7 @@ function initInputEvents() {
     // Re-populate fields with fresh constants and clear overrides
     document.querySelectorAll('.adv-override').forEach(e => e.value = '');
     populateAdvancedFields(_constants);
+    applyStateToDOM(_state);
     runCalculation();
   });
 }
@@ -819,9 +1073,12 @@ async function _initAsync() {
   await dbReady;
   _constants = await getConstants();
 
-  // Restore state from URL if present
-  const urlState = decodeURL();
-  if (urlState) Object.assign(_state, urlState);
+  // Restore state from URL if present (links without `type` decode as PAWS)
+  const urlState = decodeState(window.location.search, _constants);
+  _state = urlState ?? defaultState('paws', _constants);
+
+  buildTypeSelector();
+  configureForType();
 
   // Apply URL override values first, then fill any remaining blank advanced
   // fields with constant defaults (populateAdvancedFields only writes to empty fields).
@@ -845,8 +1102,8 @@ async function _initAsync() {
 
   // FIX [9 a11y]: add ARIA roles to canvas elements after first render
   const ariaMap = {
-    'chart-donut':      'Funding mix donut chart showing timber, FGS grants, and ESG income proportions',
-    'chart-projection': '15-year stacked area chart showing woodland value projection by income stream',
+    'chart-donut':      'Funding mix donut chart showing timber, grants, and ESG income proportions',
+    'chart-projection': '15-year stacked area chart showing value projection by income stream',
   };
   Object.entries(ariaMap).forEach(([id, label]) => {
     const c = el(id);
@@ -870,7 +1127,7 @@ window.pawsTest = async (overrides = {}) => {
     'Net DIY':        fmt(r.net_year1_diy),
     'Breakeven':      r.breakeven_status,
     'Timber':         fmt(r.timber_revenue),
-    'FGS total':      fmt(r.fgs_total),
+    'Grants':         fmt(r.fgs_total),
     'ESG':            fmt(r.esg_income),
   });
   return r;

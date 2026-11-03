@@ -20,6 +20,7 @@ export const CHART_COLORS = {
   contractor: '#9b2226',
   diy:        '#ef4444',
   sweat:      '#b5830a',
+  annual_grants: '#7c9a8b',
   positive:   '#166534',
   negative:   '#9b2226',
 };
