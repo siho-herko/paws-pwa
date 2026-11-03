@@ -5,12 +5,13 @@
  *
  * calculate(inputs, constants) dispatches on inputs.project_type:
  *   area types (paws, native_woodland, new_woodland, wood_pasture, agroforestry) → areaModel (ha)
+ *   hedgerow                                                                      → hedgerowModel (m)
  * Both return the same result shape so rendering and charts stay shared.
  * Inputs without project_type are treated as 'paws'.
  */
 
 export const PROJECT_TYPES = [
-  'paws', 'native_woodland', 'new_woodland', 'wood_pasture', 'agroforestry',
+  'paws', 'native_woodland', 'new_woodland', 'wood_pasture', 'agroforestry', 'hedgerow',
 ];
 export const DEFAULT_PROJECT_TYPE = 'paws';
 
@@ -173,8 +174,76 @@ export function areaModel(inputs, constants) {
   };
 }
 
+// ─────────────────────────────────────────────────
+// Hedgerow model (linear metres)
+// ─────────────────────────────────────────────────
+
+function hedgeQuantities(inputs, profile) {
+  const d      = profile.defaults ?? {};
+  const length = Math.max(0, inputs.length_m ?? 0);
+  const mode   = inputs.hedge_mode === 'create' ? 'create' : 'restore';
+  const gapPct = mode === 'create' ? 100 : clamp(inputs.gap_pct ?? 0, 0, 100);
+  const plant_m    = length * gapPct / 100;
+  const existing_m = length - plant_m;
+  const lay_m      = mode === 'create' ? 0 : clamp(inputs.lay_m ?? 0, 0, existing_m);
+  const coppice_m  = mode === 'create' ? 0 : clamp(inputs.coppice_m ?? 0, 0, existing_m - lay_m);
+  const ppm        = Math.max(0, inputs.plants_per_m ?? d.plants_per_m ?? 6);
+  const guards     = ['vole', 'rabbit'].includes(inputs.guards) ? inputs.guards : 'none';
+
+  const q = {
+    length_m: length,
+    plant_m,
+    existing_m,
+    lay_m,
+    coppice_m,
+    plants:        plant_m * ppm,
+    guard_m:       guards === 'none' ? 0 : plant_m,
+    stock_fence_m: Math.max(0, inputs.stock_fence_m ?? 0),
+    fixed:         length > 0 ? 1 : 0,
+  };
+  return { q, ctx: { ppm, guards, hedge_mode: mode }, gapPct };
+}
+
+function hedgeCostItems(q, c, guards) {
+  const items = [
+    { key: 'planting', label: 'Hedge planting (plants + labour)', compare_label: 'Planting',
+      contractor: q.plants * c.plant_contractor_each, diy: q.plants * c.plant_diy_each },
+  ];
+  if (guards !== 'none') {
+    items.push({ key: 'guards', label: guards === 'vole' ? 'Vole guards' : 'Rabbit / hare guards', compare_label: 'Guards',
+      contractor: q.plants * (c[`guard_${guards}_contractor_each`] ?? 0),
+      diy:        q.plants * (c[`guard_${guards}_diy_each`] ?? 0) });
+  }
+  items.push(
+    { key: 'laying',    label: 'Hedge laying',    compare_label: 'Laying',
+      contractor: q.lay_m * c.lay_contractor_per_m,         diy: q.lay_m * c.lay_diy_per_m },
+    { key: 'coppicing', label: 'Hedge coppicing', compare_label: 'Coppicing',
+      contractor: q.coppice_m * c.coppice_contractor_per_m, diy: q.coppice_m * c.coppice_diy_per_m },
+    { key: 'fencing',   label: 'Stock fencing (installed)', compare_label: 'Stock Fencing',
+      contractor: q.stock_fence_m * c.stock_fence_contractor_per_m, diy: q.stock_fence_m * c.stock_fence_diy_per_m },
+  );
+  return items;
+}
+
+/**
+ * Hedgerow model: gapping-up, laying, coppicing, new planting and stock fencing, per metre.
+ */
+export function hedgerowModel(inputs, constants) {
+  const profile = getProfile(constants, 'hedgerow');
+  const c       = effectiveCosts(constants, profile);
+  const { q, ctx, gapPct } = hedgeQuantities(inputs, profile);
+  const grants  = evaluateGrants(profile, constants, q, ctx, inputs);
+  return {
+    type: 'hedgerow', profile, quantities: q, costs: c,
+    grants, cost_items: hedgeCostItems(q, c, ctx.guards),
+    size: q.length_m, unit: 'm',
+    gap_pct: gapPct, hedge_mode: ctx.hedge_mode, guards: ctx.guards, plants_per_m: ctx.ppm,
+  };
+}
+
 function runModel(inputs, constants) {
-  return areaModel(inputs, constants);
+  const profile = getProfile(constants, projectType(inputs));
+  return isLinear(profile) ? hedgerowModel(inputs, constants) : areaModel(inputs, constants);
 }
 
 // ─────────────────────────────────────────────────
@@ -255,6 +324,9 @@ export function fgsGrants(inputs, constants) {
  * @returns {number}
  */
 export function esgIncome(inputs) {
+  if (projectType(inputs) === 'hedgerow') {
+    return Math.max(0, inputs.length_m ?? 0) * (inputs.esg_per_m ?? 0);
+  }
   return inputs.hectares * inputs.esg_per_ha;
 }
 

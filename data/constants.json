@@ -7,6 +7,7 @@
     "rates_checked": "2026-11",
     "verify_policy": "Every grant rate carries a source URL and a verify note. Published FGS and AECS rates must be re-checked against ruralpayments.org before release. Cost rates are working estimates, not published figures."
   },
+
   "timber": {
     "yield_tons_per_ha": 350,
     "note": "Assumes mature 40-year-old plantation",
@@ -52,187 +53,194 @@
       "5": "Severe — skyline winching"
     }
   },
+
   "fgs_grants": {
     "note": "Forestry Grant Scheme (FGS) Scotland. The first four entries are the legacy PAWS model rates and are kept unchanged so existing PAWS results do not move.",
     "deer_fencing_grant_per_m": {
-      "value": 9.9,
-      "unit": "£/m",
-      "label": "Deer fencing grant",
+      "value": 9.90, "unit": "£/m", "label": "Deer fencing grant",
       "source": "FGS Woodland Creation Table 5, 'Deer fence – high cost' £9.90/m — https://www.ruralpayments.org/topics/all-schemes/forestry-grant-scheme/woodland-creation/",
       "verify": "Matches the published high-cost deer fence rate. Standard deer fence is £7.60/m (Woodland Creation) or £9.50/m (Woodland Improvement Grant)."
     },
     "tree_protection_per_tree": {
-      "value": 2.2,
-      "unit": "£/tree",
-      "label": "Tree protection (stakes)",
+      "value": 2.20, "unit": "£/tree", "label": "Tree protection (stakes)",
       "source": "Legacy PAWS model value. Nearest published item: FGS 'Tree Shelter: 1.2 to 1.8 Metres' £2.00 each — https://www.ruralpayments.org/topics/all-schemes/forestry-grant-scheme/woodland-creation/",
       "verify": "Legacy £2.20 is above the published £2.00 shelter rate. Kept for PAWS regression; Simon to confirm."
     },
     "restocking_grant_per_ha": {
-      "value": 2400,
-      "unit": "£/ha",
-      "label": "Restocking grant",
+      "value": 2400, "unit": "£/ha", "label": "Restocking grant",
       "source": "Legacy PAWS model value. Published FGS 'Woodland Improvement Grant – Restructuring Regeneration' is £300/ha (UKFS) or £550/ha (Diversity and Resilience) — https://www.ruralpayments.org/topics/all-schemes/forestry-grant-scheme/woodland-improvement-grant/restructuring-regeneration/",
       "verify": "Legacy £2,400/ha is far above the published restocking rates. Kept unchanged so PAWS results match; Simon to confirm which FGS item this was meant to represent."
     },
     "rhododendron_clearance_per_ha": {
-      "value": 1500,
-      "unit": "£/ha",
-      "label": "Rhododendron clearance",
+      "value": 1500, "unit": "£/ha", "label": "Rhododendron clearance",
       "source": "Legacy PAWS model value. Published FGS WIG Habitats and Species 'Rhododendron Eradication' ranges £2,200–£7,300/ha of infested land — https://www.ruralpayments.org/topics/all-schemes/forestry-grant-scheme/woodland-improvement-grant/habitats-and-species/",
       "verify": "Legacy £1,500/ha is below every published rhododendron eradication rate. Kept for PAWS regression; requires a 10-year Rhododendron Control Plan."
     },
     "natural_regen_discount": 0.7,
     "note_regen": "Legacy PAWS assumption: natural regen attracts ~70% of the active planting grant rate",
+
     "wc_native_broadleaves_initial_per_ha": {
-      "value": 1840,
-      "unit": "£/ha",
-      "label": "Woodland Creation – Native Broadleaves (initial planting)",
+      "value": 1840, "unit": "£/ha", "label": "Woodland Creation – Native Broadleaves (initial planting)",
       "source": "FGS Woodland Creation Table 1, standard areas — https://www.ruralpayments.org/topics/all-schemes/forestry-grant-scheme/woodland-creation/ (PDF published 6 Oct 2025)",
       "verify": "Standard-area rate. Target areas pay £2,070/ha. Rates fall above 300 ha. Minimum 1,600 stems/ha at year 5."
     },
     "wc_native_broadleaves_annual_per_ha_yr": {
-      "value": 272,
-      "unit": "£/ha/yr",
-      "label": "Woodland Creation – annual maintenance (5 yrs)",
+      "value": 272, "unit": "£/ha/yr", "label": "Woodland Creation – annual maintenance (5 yrs)",
       "source": "FGS Woodland Creation Table 1, standard areas — https://www.ruralpayments.org/topics/all-schemes/forestry-grant-scheme/woodland-creation/",
       "verify": "Paid for five years (or as two Establishment Operations capital items). Target areas pay £306/ha/yr."
     },
     "wc_deer_fence_per_m": {
-      "value": 7.6,
-      "unit": "£/m",
-      "label": "Deer fencing grant",
+      "value": 7.60, "unit": "£/m", "label": "Deer fencing grant",
       "source": "FGS Woodland Creation Table 5 'Deer Fence' — https://www.ruralpayments.org/topics/all-schemes/forestry-grant-scheme/woodland-creation/",
       "verify": "Standard deer fence. High-cost deer fence is £9.90/m where justified."
     },
     "wc_vole_guard_each": {
-      "value": 0.19,
-      "unit": "£/tree",
-      "label": "Vole guards",
+      "value": 0.19, "unit": "£/tree", "label": "Vole guards",
       "source": "FGS Woodland Creation Table 5 'Vole Guard' — https://www.ruralpayments.org/topics/all-schemes/forestry-grant-scheme/woodland-creation/",
       "verify": "Assumes the site is deer fenced so shelters are not needed (FGS presumes fencing is the preferred protection)."
     },
     "wig_deer_fence_per_m": {
-      "value": 9.5,
-      "unit": "£/m",
-      "label": "Deer fencing grant",
+      "value": 9.50, "unit": "£/m", "label": "Deer fencing grant",
       "source": "FGS WIG Habitats and Species 'Deer Fence' — https://www.ruralpayments.org/topics/all-schemes/forestry-grant-scheme/woodland-improvement-grant/habitats-and-species/",
       "verify": "Woodland Improvement Grant rate for existing woodland."
     },
     "wig_stock_fence_per_m": {
-      "value": 5.5,
-      "unit": "£/m",
-      "label": "Stock fencing grant",
+      "value": 5.50, "unit": "£/m", "label": "Stock fencing grant",
       "source": "FGS WIG Habitats and Species 'Stock Fence' — https://www.ruralpayments.org/topics/all-schemes/forestry-grant-scheme/woodland-improvement-grant/habitats-and-species/",
       "verify": "March (shared boundary) stock fence is £2.75/m."
     },
     "wig_small_scale_planting_per_tree": {
-      "value": 3.0,
-      "unit": "£/tree",
-      "label": "Small-scale tree and shrub planting",
+      "value": 3.00, "unit": "£/tree", "label": "Small-scale tree and shrub planting",
       "source": "FGS WIG Habitats and Species 'Small-scale Tree and Shrub Planting' — https://www.ruralpayments.org/topics/all-schemes/forestry-grant-scheme/woodland-improvement-grant/habitats-and-species/",
       "verify": "Used for enrichment planting in existing native woodland. Rate includes shelter; confirm eligibility with the local conservancy."
     },
     "wig_new_natural_regen_per_ha": {
-      "value": 300,
-      "unit": "£/ha",
-      "label": "New natural regeneration establishment",
+      "value": 300, "unit": "£/ha", "label": "New natural regeneration establishment",
       "source": "FGS WIG Habitats and Species 'New Natural Regeneration Establishment' — https://www.ruralpayments.org/topics/all-schemes/forestry-grant-scheme/woodland-improvement-grant/habitats-and-species/",
       "verify": "Applied to the natural-regen share of the site. Confirm whether regen for new woodland is funded here or under Woodland Creation."
     },
     "wig_rhodo_mechanised_medium_per_ha": {
-      "value": 3400,
-      "unit": "£/ha",
-      "label": "Rhododendron eradication (mechanised, medium)",
+      "value": 3400, "unit": "£/ha", "label": "Rhododendron eradication (mechanised, medium)",
       "source": "FGS WIG Habitats and Species 'Rhododendron Eradication – Mechanised – Medium' — https://www.ruralpayments.org/topics/all-schemes/forestry-grant-scheme/woodland-improvement-grant/habitats-and-species/",
       "verify": "Per hectare of infested land. Published range is £2,200 (mechanised light) to £7,300 (manual difficult). Needs a 10-year Rhododendron Control Plan."
     },
     "wig_scrub_intermediate_per_ha": {
-      "value": 1500,
-      "unit": "£/ha",
-      "label": "Scrub / invasive clearance (intermediate)",
+      "value": 1500, "unit": "£/ha", "label": "Scrub / invasive clearance (intermediate)",
       "source": "FGS WIG Habitats and Species 'Scrub / Woody Vegetation Eradication – Intermediate' — https://www.ruralpayments.org/topics/all-schemes/forestry-grant-scheme/woodland-improvement-grant/habitats-and-species/",
       "verify": "Light is £1,100/ha and heavy £2,200/ha of infested land."
     },
     "wig_single_standard_tree_each": {
-      "value": 100,
-      "unit": "£/tree",
-      "label": "Replacement or new single standard tree",
+      "value": 100, "unit": "£/tree", "label": "Replacement or new single standard tree",
       "source": "FGS WIG 'Replacement or New Single Standard Tree' — https://www.ruralpayments.org/topics/all-schemes/forestry-grant-scheme/forestry-grant-scheme-capital-items/replacement-or-new-single-standard-tree/",
       "verify": "Only for landscape purposes under WIG Habitats and Species or WIAT. Includes protection and aftercare. AECS 'Replacement or Planting of Individual Trees within Ancient Wood Pasture' may be the better fit."
     },
     "wig_woodland_grazing_plan": {
-      "value": 1200,
-      "unit": "£/plan",
-      "label": "Woodland Grazing Management Plan",
+      "value": 1200, "unit": "£/plan", "label": "Woodland Grazing Management Plan",
       "source": "FGS Woodland Improvement Grant planning options — https://www.ruralpayments.org/topics/all-schemes/forestry-grant-scheme/woodland-improvement-grant/",
       "verify": "One-off payment per plan."
     },
     "smf_native_woodland_per_ha_yr": {
-      "value": 25,
-      "unit": "£/ha/yr",
-      "label": "Sustainable Management – Native Woodland (5 yrs)",
+      "value": 25, "unit": "£/ha/yr", "label": "Sustainable Management – Native Woodland (5 yrs)",
       "source": "FGS Sustainable Management of Forests — https://www.ruralpayments.org/topics/all-schemes/forestry-grant-scheme/sustainable-management-of-forests/native-woodland/",
       "verify": "Annual, up to five years. Requires a Forest Plan or Management Plan and annual herbivore impact monitoring."
     },
     "smf_woodland_grazing_per_ha_yr": {
-      "value": 100,
-      "unit": "£/ha/yr",
-      "label": "Sustainable Management – Woodland Grazing (5 yrs)",
+      "value": 100, "unit": "£/ha/yr", "label": "Sustainable Management – Woodland Grazing (5 yrs)",
       "source": "FGS Sustainable Management of Forests — https://www.ruralpayments.org/topics/all-schemes/forestry-grant-scheme/sustainable-management-of-forests/",
       "verify": "Annual, up to five years. Needs an approved Woodland Grazing Management Plan."
     },
     "agroforestry_low_initial_per_ha": {
-      "value": 2790,
-      "unit": "£/ha",
-      "label": "Agroforestry establishment (150–200 trees/ha)",
+      "value": 2790, "unit": "£/ha", "label": "Agroforestry establishment (150–200 trees/ha)",
       "source": "FGS Agroforestry — https://www.ruralpayments.org/topics/all-schemes/forestry-grant-scheme/agroforestry/",
       "verify": "Rate covers trees, protection, planting and beating up. Minimum 150 stems/ha at year 5. Area 0.5–15 ha per farm business."
     },
     "agroforestry_low_annual_per_ha_yr": {
-      "value": 72,
-      "unit": "£/ha/yr",
-      "label": "Agroforestry maintenance (5 yrs)",
+      "value": 72, "unit": "£/ha/yr", "label": "Agroforestry maintenance (5 yrs)",
       "source": "FGS Agroforestry — https://www.ruralpayments.org/topics/all-schemes/forestry-grant-scheme/agroforestry/",
       "verify": "Paid for five years at the 150–200 trees/ha density."
     },
     "agroforestry_high_initial_per_ha": {
-      "value": 5400,
-      "unit": "£/ha",
-      "label": "Agroforestry establishment (300–400 trees/ha)",
+      "value": 5400, "unit": "£/ha", "label": "Agroforestry establishment (300–400 trees/ha)",
       "source": "FGS Agroforestry — https://www.ruralpayments.org/topics/all-schemes/forestry-grant-scheme/agroforestry/",
       "verify": "Minimum 300 stems/ha at year 5. Densities between 201 and 299 trees/ha are modelled at the lower rate."
     },
     "agroforestry_high_annual_per_ha_yr": {
-      "value": 126,
-      "unit": "£/ha/yr",
-      "label": "Agroforestry maintenance (5 yrs)",
+      "value": 126, "unit": "£/ha/yr", "label": "Agroforestry maintenance (5 yrs)",
       "source": "FGS Agroforestry — https://www.ruralpayments.org/topics/all-schemes/forestry-grant-scheme/agroforestry/",
       "verify": "Paid for five years at the 300–400 trees/ha density."
     }
   },
+
+  "aecs_grants": {
+    "note": "Agri-Environment Climate Scheme (AECS) hedgerow option and capital items. AECS contracts run five years; capital items are paid once on completion.",
+    "hedge_planting_per_m": {
+      "value": 5.40, "unit": "£/m", "label": "Planting or replanting of hedges",
+      "source": "AECS capital item — https://www.ruralpayments.org/topics/all-schemes/agri-environment-climate-scheme/management-options-and-capital-items/planting-or-replanting-of-hedges/",
+      "verify": "Gapping up is only eligible for gaps over 5 m. Double row, minimum 6 plants/m, at least three native species. Must be combined with stock fence or guards. Shared boundaries claim half."
+    },
+    "hedge_laying_per_m": {
+      "value": 12.50, "unit": "£/m", "label": "Laying of hedges",
+      "source": "AECS capital item — https://www.ruralpayments.org/topics/all-schemes/agri-environment-climate-scheme/management-options-and-capital-items/laying-of-hedges/",
+      "verify": "Claimable once per length during the contract. Lay between 1 September and 31 March."
+    },
+    "hedge_coppicing_per_m": {
+      "value": 3.75, "unit": "£/m", "label": "Coppicing of hedges",
+      "source": "AECS capital item — https://www.ruralpayments.org/topics/all-schemes/agri-environment-climate-scheme/management-options-and-capital-items/coppicing-of-hedges/",
+      "verify": "Coppice between 1 December and end of February. Claimable once per length."
+    },
+    "stock_fence_per_m": {
+      "value": 5.50, "unit": "£/m", "label": "Stock fencing grant",
+      "source": "AECS capital item — https://www.ruralpayments.org/topics/all-schemes/agri-environment-climate-scheme/management-options-and-capital-items/stock-fence/",
+      "verify": "£2.75/m on a shared boundary. Not funded if an existing fence would last the 5-year contract. New fences at least 1 m from hedge centre line."
+    },
+    "vole_guards_per_m": {
+      "value": 1.20, "unit": "£/m", "label": "Vole guards (hedge planting)",
+      "source": "AECS capital item — https://www.ruralpayments.org/topics/all-schemes/agri-environment-climate-scheme/management-options-and-capital-items/vole--rabbit-or-hare-guards/",
+      "verify": "Per metre of planted hedge. Guard at least 20 cm tall."
+    },
+    "rabbit_hare_guards_per_m": {
+      "value": 1.80, "unit": "£/m", "label": "Rabbit or hare guards (hedge planting)",
+      "source": "AECS capital item — https://www.ruralpayments.org/topics/all-schemes/agri-environment-climate-scheme/management-options-and-capital-items/vole--rabbit-or-hare-guards/",
+      "verify": "Per metre of planted hedge. Not combinable with rabbit-proof fencing."
+    },
+    "hedge_management_per_m_yr": {
+      "value": 0.11, "unit": "£/m/yr", "label": "Management or restoration of hedgerows (5 yrs)",
+      "source": "AECS management option — https://www.ruralpayments.org/topics/all-schemes/agri-environment-climate-scheme/management-options-and-capital-items/management-or-restoration-of-hedgerows/",
+      "verify": "Annual per linear metre of managed hedge. Needs a hedgerow management plan; available throughout Scotland."
+    },
+    "hedge_creation_per_m_yr": {
+      "value": 1.20, "unit": "£/m/yr", "label": "Creation of hedgerows (5 yrs)",
+      "source": "AECS management option — https://www.ruralpayments.org/topics/all-schemes/agri-environment-climate-scheme/management-options-and-capital-items/creation-of-hedgerows/",
+      "verify": "Only available inside the Creation of Hedgerows target area (check with the AECS targeting tool). New hedge must link existing farmland habitats."
+    }
+  },
+
   "costs": {
-    "fencing_contractor_per_m": 12.0,
+    "fencing_contractor_per_m": 12.00,
     "note_fencing": "Real-world contractor rate; FGS grant covers ~82% of this",
-    "tree_cost_each": 2.5,
+    "tree_cost_each": 2.50,
     "note_tree": "Bare-root native broadleaf whips, including stakes and guards",
     "trees_per_ha": 2000,
     "agent_fee_pct": 0.12,
-    "diy_fencing_per_m": 7.5,
+    "diy_fencing_per_m": 7.50,
     "note_diy_fencing": "Materials only — assumes landowner provides labour",
-    "diy_planting_per_tree": 0.8,
+    "diy_planting_per_tree": 0.80,
     "note_diy_planting": "Materials only — bare-root whips, no contractor planting labour",
     "rhodo_contractor_per_ha": 3000,
     "rhodo_diy_per_ha": 700,
     "note_rhodo": "Estimate for mechanised clearance of medium infestation; DIY assumes landowner labour with hired flail/herbicide. Verify with local contractors."
   },
+
   "esg": {
     "min_per_ha": 0,
     "typical_min_per_ha": 500,
     "max_per_ha": 2500,
     "default_per_ha": 1000,
+    "max_per_m": 10,
+    "default_per_m": 1,
     "note": "Private BNG / ESG sponsorship from distilleries, corporates. WCC carbon credits NOT applicable to PAWS restocking."
   },
+
   "long_term_values": {
     "note": "15-year projected annual values per hectare of restored broadleaf woodland",
     "firewood_biomass_per_ha_yr": 350,
@@ -241,6 +249,7 @@
     "bng_credit_annual_per_ha": 180,
     "note_bng": "Annualised BNG credit value assuming 30-year credit agreement"
   },
+
   "profiles": {
     "paws": {
       "label": "PAWS restoration",
@@ -251,69 +260,24 @@
       "timber_enabled": true,
       "timber_optional": false,
       "fence_type": "deer",
-      "sections": {
-        "harvest": true,
-        "regen": true,
-        "rhodo": true
-      },
+      "sections": { "harvest": true, "regen": true, "rhodo": true },
       "species_label": "Conifer crop to remove",
       "species": {
-        "sitka_spruce": {
-          "label": "Sitka Spruce",
-          "icon": "🌲"
-        },
-        "scots_pine": {
-          "label": "Scots Pine",
-          "icon": "🌳"
-        },
-        "larch": {
-          "label": "Larch",
-          "icon": "🍂"
-        },
-        "mixed_conifer": {
-          "label": "Mixed Conifer",
-          "icon": "🌿"
-        }
+        "sitka_spruce":  { "label": "Sitka Spruce",  "icon": "🌲" },
+        "scots_pine":    { "label": "Scots Pine",    "icon": "🌳" },
+        "larch":         { "label": "Larch",         "icon": "🍂" },
+        "mixed_conifer": { "label": "Mixed Conifer", "icon": "🌿" }
       },
       "defaults": {
-        "hectares": 4,
-        "species": "sitka_spruce",
-        "difficulty": 2,
-        "fencing_m": 400,
-        "natural_regen_pct": 40,
-        "esg_per_ha": 1000,
-        "rhodo_enabled": true,
-        "rhodo_pct": 100,
-        "timber_enabled": true
+        "hectares": 4, "species": "sitka_spruce", "difficulty": 2, "fencing_m": 400,
+        "natural_regen_pct": 40, "esg_per_ha": 1000,
+        "rhodo_enabled": true, "rhodo_pct": 100, "timber_enabled": true
       },
       "grants": [
-        {
-          "key": "fencing_grant",
-          "role": "fencing",
-          "rate": "fgs_grants.deer_fencing_grant_per_m",
-          "basis": "fence_m",
-          "override": "fencing"
-        },
-        {
-          "key": "tree_protection_grant",
-          "role": "protection",
-          "rate": "fgs_grants.tree_protection_per_tree",
-          "basis": "trees"
-        },
-        {
-          "key": "restocking_grant",
-          "role": "establishment",
-          "rate": "fgs_grants.restocking_grant_per_ha",
-          "basis": "ha_establish",
-          "regen_factor": "fgs_grants.natural_regen_discount",
-          "override": "establishment"
-        },
-        {
-          "key": "rhododendron_grant",
-          "role": "rhodo",
-          "rate": "fgs_grants.rhododendron_clearance_per_ha",
-          "basis": "rhodo_ha"
-        }
+        { "key": "fencing_grant",         "role": "fencing",       "rate": "fgs_grants.deer_fencing_grant_per_m",      "basis": "fence_m",      "override": "fencing" },
+        { "key": "tree_protection_grant", "role": "protection",    "rate": "fgs_grants.tree_protection_per_tree",      "basis": "trees" },
+        { "key": "restocking_grant",      "role": "establishment", "rate": "fgs_grants.restocking_grant_per_ha",       "basis": "ha_establish", "regen_factor": "fgs_grants.natural_regen_discount", "override": "establishment" },
+        { "key": "rhododendron_grant",    "role": "rhodo",         "rate": "fgs_grants.rhododendron_clearance_per_ha", "basis": "rhodo_ha" }
       ],
       "costs": {
         "rhodo_contractor_per_ha": 0,
@@ -321,6 +285,7 @@
         "note_rhodo": "Legacy PAWS model never charged a clearance cost. Held at 0 so existing PAWS results are unchanged — Simon to decide whether to add one."
       }
     },
+
     "native_woodland": {
       "label": "Native woodland",
       "icon": "🌳",
@@ -332,90 +297,38 @@
       "timber_species": "mixed_broadleaf",
       "timber_yield_t_per_ha": 60,
       "fence_type": "deer",
-      "sections": {
-        "harvest": true,
-        "regen": true,
-        "rhodo": true
-      },
+      "sections": { "harvest": true, "regen": true, "rhodo": true },
       "species_label": "Planting mix",
       "species": {
-        "native_broadleaf_mix": {
-          "label": "Native broadleaf mix (oak, birch, rowan, hazel)",
-          "icon": "🌳"
-        },
-        "upland_birch": {
-          "label": "Upland birchwood",
-          "icon": "🌿"
-        },
-        "native_scots_pine": {
-          "label": "Native Scots pinewood",
-          "icon": "🌲"
-        },
-        "wet_woodland": {
-          "label": "Wet woodland (alder, willow)",
-          "icon": "💧"
-        }
+        "native_broadleaf_mix": { "label": "Native broadleaf mix (oak, birch, rowan, hazel)", "icon": "🌳" },
+        "upland_birch":         { "label": "Upland birchwood",                              "icon": "🌿" },
+        "native_scots_pine":    { "label": "Native Scots pinewood",                         "icon": "🌲" },
+        "wet_woodland":         { "label": "Wet woodland (alder, willow)",                  "icon": "💧" }
       },
       "defaults": {
-        "hectares": 4,
-        "species": "native_broadleaf_mix",
-        "difficulty": 2,
-        "fencing_m": 400,
-        "natural_regen_pct": 70,
-        "esg_per_ha": 1000,
-        "rhodo_enabled": true,
-        "rhodo_pct": 20,
-        "timber_enabled": false
+        "hectares": 4, "species": "native_broadleaf_mix", "difficulty": 2, "fencing_m": 400,
+        "natural_regen_pct": 70, "esg_per_ha": 1000,
+        "rhodo_enabled": true, "rhodo_pct": 20, "timber_enabled": false
       },
       "grants": [
-        {
-          "key": "fencing_grant",
-          "role": "fencing",
-          "rate": "fgs_grants.wig_deer_fence_per_m",
-          "basis": "fence_m",
-          "override": "fencing"
-        },
-        {
-          "key": "planting_grant",
-          "role": "establishment",
-          "rate": "fgs_grants.wig_small_scale_planting_per_tree",
-          "basis": "trees",
-          "override": "establishment"
-        },
-        {
-          "key": "regen_grant",
-          "role": "regen",
-          "rate": "fgs_grants.wig_new_natural_regen_per_ha",
-          "basis": "ha_regen"
-        },
-        {
-          "key": "rhododendron_grant",
-          "role": "rhodo",
-          "rate": "fgs_grants.wig_rhodo_mechanised_medium_per_ha",
-          "basis": "rhodo_ha"
-        },
-        {
-          "key": "smf_native",
-          "role": "annual",
-          "rate": "fgs_grants.smf_native_woodland_per_ha_yr",
-          "basis": "ha",
-          "annual_years": 5
-        }
+        { "key": "fencing_grant",      "role": "fencing",       "rate": "fgs_grants.wig_deer_fence_per_m",               "basis": "fence_m",  "override": "fencing" },
+        { "key": "planting_grant",     "role": "establishment", "rate": "fgs_grants.wig_small_scale_planting_per_tree",  "basis": "trees",    "override": "establishment" },
+        { "key": "regen_grant",        "role": "regen",         "rate": "fgs_grants.wig_new_natural_regen_per_ha",       "basis": "ha_regen" },
+        { "key": "rhododendron_grant", "role": "rhodo",         "rate": "fgs_grants.wig_rhodo_mechanised_medium_per_ha", "basis": "rhodo_ha" },
+        { "key": "smf_native",         "role": "annual",        "rate": "fgs_grants.smf_native_woodland_per_ha_yr",      "basis": "ha",       "annual_years": 5 }
       ],
       "costs": {
         "trees_per_ha": 1100,
-        "tree_cost_each": 3.2,
-        "diy_planting_per_tree": 1.4,
+        "tree_cost_each": 3.20,
+        "diy_planting_per_tree": 1.40,
         "note_tree": "Enrichment planting on the non-regen share: whip, 1.2 m shelter and stake. Estimate."
       },
       "long_term_values": {
-        "firewood": 250,
-        "sporting": 120,
-        "natural_capital": 280,
-        "bng": 180,
+        "firewood": 250, "sporting": 120, "natural_capital": 280, "bng": 180,
         "note": "Per ha/yr once canopy recovers. Estimate — verify."
       }
     },
+
     "new_woodland": {
       "label": "New native woodland",
       "icon": "🌱",
@@ -425,90 +338,38 @@
       "timber_enabled": false,
       "timber_optional": false,
       "fence_type": "deer",
-      "sections": {
-        "harvest": false,
-        "regen": true,
-        "rhodo": false
-      },
+      "sections": { "harvest": false, "regen": true, "rhodo": false },
       "species_label": "Planting mix",
       "species": {
-        "native_broadleaf_mix": {
-          "label": "Native broadleaf mix (oak, birch, rowan, hazel)",
-          "icon": "🌳"
-        },
-        "upland_birch": {
-          "label": "Upland birchwood",
-          "icon": "🌿"
-        },
-        "native_scots_pine": {
-          "label": "Native Scots pinewood",
-          "icon": "🌲"
-        },
-        "wet_woodland": {
-          "label": "Wet woodland (alder, willow)",
-          "icon": "💧"
-        }
+        "native_broadleaf_mix": { "label": "Native broadleaf mix (oak, birch, rowan, hazel)", "icon": "🌳" },
+        "upland_birch":         { "label": "Upland birchwood",                              "icon": "🌿" },
+        "native_scots_pine":    { "label": "Native Scots pinewood",                         "icon": "🌲" },
+        "wet_woodland":         { "label": "Wet woodland (alder, willow)",                  "icon": "💧" }
       },
       "defaults": {
-        "hectares": 4,
-        "species": "native_broadleaf_mix",
-        "difficulty": 1,
-        "fencing_m": 960,
-        "natural_regen_pct": 0,
-        "esg_per_ha": 1000,
-        "rhodo_enabled": false,
-        "rhodo_pct": 0,
-        "timber_enabled": false
+        "hectares": 4, "species": "native_broadleaf_mix", "difficulty": 1, "fencing_m": 960,
+        "natural_regen_pct": 0, "esg_per_ha": 1000,
+        "rhodo_enabled": false, "rhodo_pct": 0, "timber_enabled": false
       },
       "grants": [
-        {
-          "key": "fencing_grant",
-          "role": "fencing",
-          "rate": "fgs_grants.wc_deer_fence_per_m",
-          "basis": "fence_m",
-          "override": "fencing"
-        },
-        {
-          "key": "vole_guard_grant",
-          "role": "protection",
-          "rate": "fgs_grants.wc_vole_guard_each",
-          "basis": "trees"
-        },
-        {
-          "key": "wc_initial",
-          "role": "establishment",
-          "rate": "fgs_grants.wc_native_broadleaves_initial_per_ha",
-          "basis": "ha_active",
-          "override": "establishment"
-        },
-        {
-          "key": "regen_grant",
-          "role": "regen",
-          "rate": "fgs_grants.wig_new_natural_regen_per_ha",
-          "basis": "ha_regen"
-        },
-        {
-          "key": "wc_maintenance",
-          "role": "annual",
-          "rate": "fgs_grants.wc_native_broadleaves_annual_per_ha_yr",
-          "basis": "ha_active",
-          "annual_years": 5
-        }
+        { "key": "fencing_grant",     "role": "fencing",       "rate": "fgs_grants.wc_deer_fence_per_m",                    "basis": "fence_m",  "override": "fencing" },
+        { "key": "vole_guard_grant",  "role": "protection",    "rate": "fgs_grants.wc_vole_guard_each",                     "basis": "trees" },
+        { "key": "wc_initial",        "role": "establishment", "rate": "fgs_grants.wc_native_broadleaves_initial_per_ha",   "basis": "ha_active", "override": "establishment" },
+        { "key": "regen_grant",       "role": "regen",         "rate": "fgs_grants.wig_new_natural_regen_per_ha",           "basis": "ha_regen" },
+        { "key": "wc_maintenance",    "role": "annual",        "rate": "fgs_grants.wc_native_broadleaves_annual_per_ha_yr", "basis": "ha_active", "annual_years": 5 }
       ],
       "costs": {
         "trees_per_ha": 1600,
-        "tree_cost_each": 1.8,
-        "diy_planting_per_tree": 0.7,
+        "tree_cost_each": 1.80,
+        "diy_planting_per_tree": 0.70,
         "note_tree": "Fenced site: bare-root whip, vole guard, ground prep and planting labour. Estimate."
       },
       "long_term_values": {
-        "firewood": 100,
-        "sporting": 80,
-        "natural_capital": 250,
-        "bng": 180,
+        "firewood": 100, "sporting": 80, "natural_capital": 250, "bng": 180,
         "note": "Per ha/yr as the young wood establishes. Estimate — verify."
       }
     },
+
     "wood_pasture": {
       "label": "Wood pasture",
       "icon": "🐄",
@@ -518,96 +379,44 @@
       "timber_enabled": false,
       "timber_optional": false,
       "fence_type": "stock",
-      "sections": {
-        "harvest": false,
-        "regen": false,
-        "rhodo": true
-      },
+      "sections": { "harvest": false, "regen": false, "rhodo": true },
       "rhodo_label": "Scrub / invasive clearance",
       "species_label": "Standard trees",
       "species": {
-        "oak_standards": {
-          "label": "Oak standards",
-          "icon": "🌳"
-        },
-        "mixed_parkland": {
-          "label": "Mixed native standards (oak, lime, rowan)",
-          "icon": "🌿"
-        },
-        "fruit_nut": {
-          "label": "Fruit and nut standards",
-          "icon": "🍎"
-        }
+        "oak_standards":  { "label": "Oak standards",                               "icon": "🌳" },
+        "mixed_parkland": { "label": "Mixed native standards (oak, lime, rowan)",   "icon": "🌿" },
+        "fruit_nut":      { "label": "Fruit and nut standards",                     "icon": "🍎" }
       },
-      "stream_labels": {
-        "firewood": "Pollard wood / firewood",
-        "sporting": "Grazing & sporting"
-      },
+      "stream_labels": { "firewood": "Pollard wood / firewood", "sporting": "Grazing & sporting" },
       "defaults": {
-        "hectares": 6,
-        "species": "oak_standards",
-        "difficulty": 1,
-        "fencing_m": 0,
-        "natural_regen_pct": 0,
-        "esg_per_ha": 500,
-        "rhodo_enabled": false,
-        "rhodo_pct": 10,
-        "timber_enabled": false
+        "hectares": 6, "species": "oak_standards", "difficulty": 1, "fencing_m": 0,
+        "natural_regen_pct": 0, "esg_per_ha": 500,
+        "rhodo_enabled": false, "rhodo_pct": 10, "timber_enabled": false
       },
       "grants": [
-        {
-          "key": "fencing_grant",
-          "role": "fencing",
-          "rate": "fgs_grants.wig_stock_fence_per_m",
-          "basis": "fence_m",
-          "override": "fencing"
-        },
-        {
-          "key": "standard_trees",
-          "role": "establishment",
-          "rate": "fgs_grants.wig_single_standard_tree_each",
-          "basis": "trees",
-          "override": "establishment"
-        },
-        {
-          "key": "grazing_plan",
-          "role": "plan",
-          "rate": "fgs_grants.wig_woodland_grazing_plan",
-          "basis": "fixed"
-        },
-        {
-          "key": "scrub_grant",
-          "role": "rhodo",
-          "rate": "fgs_grants.wig_scrub_intermediate_per_ha",
-          "basis": "rhodo_ha"
-        },
-        {
-          "key": "smf_grazing",
-          "role": "annual",
-          "rate": "fgs_grants.smf_woodland_grazing_per_ha_yr",
-          "basis": "ha",
-          "annual_years": 5
-        }
+        { "key": "fencing_grant",     "role": "fencing",       "rate": "fgs_grants.wig_stock_fence_per_m",          "basis": "fence_m",  "override": "fencing" },
+        { "key": "standard_trees",    "role": "establishment", "rate": "fgs_grants.wig_single_standard_tree_each",  "basis": "trees",    "override": "establishment" },
+        { "key": "grazing_plan",      "role": "plan",          "rate": "fgs_grants.wig_woodland_grazing_plan",      "basis": "fixed" },
+        { "key": "scrub_grant",       "role": "rhodo",         "rate": "fgs_grants.wig_scrub_intermediate_per_ha",  "basis": "rhodo_ha" },
+        { "key": "smf_grazing",       "role": "annual",        "rate": "fgs_grants.smf_woodland_grazing_per_ha_yr", "basis": "ha",       "annual_years": 5 }
       ],
       "costs": {
         "trees_per_ha": 40,
         "tree_cost_each": 120,
         "diy_planting_per_tree": 60,
-        "fencing_contractor_per_m": 7.0,
-        "diy_fencing_per_m": 4.0,
+        "fencing_contractor_per_m": 7.00,
+        "diy_fencing_per_m": 4.00,
         "rhodo_contractor_per_ha": 1800,
         "rhodo_diy_per_ha": 400,
         "note_tree": "Standard tree with post-and-rail or heavy-duty cattle guard. Estimate.",
         "note_fencing": "Stock fence, contractor vs materials only. Estimate."
       },
       "long_term_values": {
-        "firewood": 40,
-        "sporting": 60,
-        "natural_capital": 200,
-        "bng": 120,
+        "firewood": 40, "sporting": 60, "natural_capital": 200, "bng": 120,
         "note": "Per ha/yr. Estimate — verify."
       }
     },
+
     "agroforestry": {
       "label": "Agroforestry",
       "icon": "🌾",
@@ -617,103 +426,91 @@
       "timber_enabled": false,
       "timber_optional": false,
       "fence_type": "stock",
-      "sections": {
-        "harvest": false,
-        "regen": false,
-        "rhodo": false,
-        "density": true
-      },
+      "sections": { "harvest": false, "regen": false, "rhodo": false, "density": true },
       "species_label": "Tree type",
       "species": {
-        "timber_broadleaves": {
-          "label": "Timber broadleaves (oak, cherry, walnut)",
-          "icon": "🌳"
-        },
-        "fruit_nut": {
-          "label": "Fruit and nut (apple, hazel)",
-          "icon": "🍎"
-        },
-        "shelter_mix": {
-          "label": "Shelter mix (alder, willow, birch)",
-          "icon": "🌿"
-        }
+        "timber_broadleaves": { "label": "Timber broadleaves (oak, cherry, walnut)", "icon": "🌳" },
+        "fruit_nut":          { "label": "Fruit and nut (apple, hazel)",             "icon": "🍎" },
+        "shelter_mix":        { "label": "Shelter mix (alder, willow, birch)",       "icon": "🌿" }
       },
-      "stream_labels": {
-        "firewood": "Tree produce (fruit, nuts, thinnings)",
-        "sporting": "Shelter & livestock benefit"
-      },
+      "stream_labels": { "firewood": "Tree produce (fruit, nuts, thinnings)", "sporting": "Shelter & livestock benefit" },
       "defaults": {
-        "hectares": 5,
-        "species": "timber_broadleaves",
-        "difficulty": 1,
-        "fencing_m": 0,
-        "natural_regen_pct": 0,
-        "esg_per_ha": 300,
-        "rhodo_enabled": false,
-        "rhodo_pct": 0,
-        "timber_enabled": false
+        "hectares": 5, "species": "timber_broadleaves", "difficulty": 1, "fencing_m": 0,
+        "natural_regen_pct": 0, "esg_per_ha": 300,
+        "rhodo_enabled": false, "rhodo_pct": 0, "timber_enabled": false
       },
       "grants": [
-        {
-          "key": "agro_low_initial",
-          "role": "establishment",
-          "rate": "fgs_grants.agroforestry_low_initial_per_ha",
-          "basis": "ha_active",
-          "override": "establishment",
-          "when": {
-            "tph_min": 150,
-            "tph_max": 299
-          }
-        },
-        {
-          "key": "agro_high_initial",
-          "role": "establishment",
-          "rate": "fgs_grants.agroforestry_high_initial_per_ha",
-          "basis": "ha_active",
-          "override": "establishment",
-          "when": {
-            "tph_min": 300,
-            "tph_max": 400
-          }
-        },
-        {
-          "key": "agro_low_annual",
-          "role": "annual",
-          "rate": "fgs_grants.agroforestry_low_annual_per_ha_yr",
-          "basis": "ha_active",
-          "annual_years": 5,
-          "when": {
-            "tph_min": 150,
-            "tph_max": 299
-          }
-        },
-        {
-          "key": "agro_high_annual",
-          "role": "annual",
-          "rate": "fgs_grants.agroforestry_high_annual_per_ha_yr",
-          "basis": "ha_active",
-          "annual_years": 5,
-          "when": {
-            "tph_min": 300,
-            "tph_max": 400
-          }
-        }
+        { "key": "agro_low_initial",  "role": "establishment", "rate": "fgs_grants.agroforestry_low_initial_per_ha",  "basis": "ha_active", "override": "establishment", "when": { "tph_min": 150, "tph_max": 299 } },
+        { "key": "agro_high_initial", "role": "establishment", "rate": "fgs_grants.agroforestry_high_initial_per_ha", "basis": "ha_active", "override": "establishment", "when": { "tph_min": 300, "tph_max": 400 } },
+        { "key": "agro_low_annual",   "role": "annual",        "rate": "fgs_grants.agroforestry_low_annual_per_ha_yr",  "basis": "ha_active", "annual_years": 5, "when": { "tph_min": 150, "tph_max": 299 } },
+        { "key": "agro_high_annual",  "role": "annual",        "rate": "fgs_grants.agroforestry_high_annual_per_ha_yr", "basis": "ha_active", "annual_years": 5, "when": { "tph_min": 300, "tph_max": 400 } }
       ],
       "costs": {
         "trees_per_ha": 200,
         "tree_cost_each": 14,
         "diy_planting_per_tree": 6,
-        "fencing_contractor_per_m": 7.0,
-        "diy_fencing_per_m": 4.0,
+        "fencing_contractor_per_m": 7.00,
+        "diy_fencing_per_m": 4.00,
         "note_tree": "Feathered tree, mesh guard and stake, planted. Estimate.",
         "note_fencing": "Agroforestry grant includes tree protection; any extra stock fencing is a cost only."
       },
       "long_term_values": {
-        "firewood": 30,
-        "sporting": 40,
-        "natural_capital": 150,
-        "bng": 100,
+        "firewood": 30, "sporting": 40, "natural_capital": 150, "bng": 100,
         "note": "Per ha/yr. Estimate — verify."
+      }
+    },
+
+    "hedgerow": {
+      "label": "Hedgerow",
+      "icon": "🌿",
+      "description": "Gapping-up, laying, coppicing or new planting of farm hedges (AECS).",
+      "model": "linear",
+      "grant_scheme": "AECS",
+      "timber_enabled": false,
+      "timber_optional": false,
+      "fence_type": "stock",
+      "sections": { "harvest": false, "regen": false, "rhodo": false },
+      "species_label": "Hedge mix",
+      "species": {
+        "hawthorn_mix": { "label": "Hawthorn-led native mix",                                   "icon": "🌿" },
+        "diverse_mix":  { "label": "Diverse native mix (hawthorn, blackthorn, hazel, holly, dog rose)", "icon": "🌸" },
+        "beech":        { "label": "Beech (AECS prior approval needed)",                      "icon": "🍂" }
+      },
+      "stream_labels": { "firewood": "Coppice / brash fuel", "sporting": "Game cover & shelter" },
+      "defaults": {
+        "length_m": 400, "species": "hawthorn_mix", "hedge_mode": "restore",
+        "gap_pct": 20, "plants_per_m": 6, "lay_m": 150, "coppice_m": 0,
+        "stock_fence_m": 400, "guards": "rabbit", "esg_per_m": 1
+      },
+      "grants": [
+        { "key": "hedge_planting",  "role": "establishment", "rate": "aecs_grants.hedge_planting_per_m",      "basis": "plant_m",       "override": "establishment", "when": { "ppm_min": 6 } },
+        { "key": "vole_guards",     "role": "protection",    "rate": "aecs_grants.vole_guards_per_m",         "basis": "guard_m",       "when": { "guards": "vole" } },
+        { "key": "rabbit_guards",   "role": "protection",    "rate": "aecs_grants.rabbit_hare_guards_per_m",  "basis": "guard_m",       "when": { "guards": "rabbit" } },
+        { "key": "hedge_laying",    "role": "laying",        "rate": "aecs_grants.hedge_laying_per_m",        "basis": "lay_m" },
+        { "key": "hedge_coppicing", "role": "coppicing",     "rate": "aecs_grants.hedge_coppicing_per_m",     "basis": "coppice_m" },
+        { "key": "fencing_grant",   "role": "fencing",       "rate": "aecs_grants.stock_fence_per_m",         "basis": "stock_fence_m", "override": "fencing" },
+        { "key": "hedge_management","role": "annual",        "rate": "aecs_grants.hedge_management_per_m_yr", "basis": "length_m",      "annual_years": 5, "when": { "hedge_mode": "restore" } },
+        { "key": "hedge_creation",  "role": "annual",        "rate": "aecs_grants.hedge_creation_per_m_yr",   "basis": "length_m",      "annual_years": 5, "when": { "hedge_mode": "create" } }
+      ],
+      "costs": {
+        "plant_contractor_each": 1.60,
+        "plant_diy_each": 0.60,
+        "guard_vole_contractor_each": 0.40,
+        "guard_vole_diy_each": 0.20,
+        "guard_rabbit_contractor_each": 0.95,
+        "guard_rabbit_diy_each": 0.55,
+        "lay_contractor_per_m": 16.00,
+        "lay_diy_per_m": 3.00,
+        "coppice_contractor_per_m": 5.00,
+        "coppice_diy_per_m": 1.00,
+        "stock_fence_contractor_per_m": 7.00,
+        "stock_fence_diy_per_m": 4.00,
+        "note": "Contractor rates include labour; DIY is materials and tool hire only. All estimates — verify with local hedge contractors."
+      },
+      "long_term_values": {
+        "unit": "km",
+        "firewood": 120, "sporting": 60, "natural_capital": 250, "bng": 300,
+        "note": "Per km/yr of restored hedge. Estimate — verify."
       }
     }
   }
