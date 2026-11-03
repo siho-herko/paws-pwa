@@ -242,21 +242,33 @@
         <!-- ── Section 5: Private Funding ── -->
         <div class="input-section open" id="section-funding">
           <div class="input-section-header" role="button" tabindex="0" aria-expanded="true" aria-controls="body-funding">
-            <h3><span class="section-number">05</span> Private Funding</h3>
+            <h3><span class="section-number">05</span> Grants and Private Funding</h3>
             <span class="section-chevron">▼</span>
           </div>
           <div class="input-section-body" id="body-funding">
 
+            <div class="toggle-row">
+              <span class="toggle-label">Exclude grants</span>
+              <label class="toggle-switch" aria-label="Include conditional Forestry Grant Scheme grants">
+                <input type="checkbox" id="input-grants">
+                <span class="toggle-track"></span>
+              </label>
+              <span class="toggle-label">Include conditional grants</span>
+            </div>
+            <p class="helper-text mt-8">
+              Grants are not confirmed. Restructuring Regeneration pays £300 or £550/ha only with an approved Felling Permission or forest plan and the required species mix. Deer fencing is claimable only through Woodland Creation or Habitats and Species, where Scottish Forestry agrees deer would otherwise prevent the objectives. Rhododendron rates depend on method and infested area. Check with Scottish Forestry before relying on any grant.
+            </p>
+
             <div class="slider-row">
               <label for="input-esg">
                 ESG sponsorship rate
-                <span class="slider-value mono" id="val-esg">£750/ha</span>
+                <span class="slider-value mono" id="val-esg">£0/ha</span>
               </label>
               <input
                 type="range"
                 id="input-esg"
                 min="0" max="2500" step="50"
-                value="750"
+                value="0"
                 aria-label="ESG sponsorship rate per hectare"
               >
               <div class="slider-track-labels">
@@ -265,7 +277,7 @@
               </div>
             </div>
             <p class="helper-text mt-8">
-              Local distilleries, corporates, or land agents paying for Biodiversity Net Gain credits.
+              Optional scenario: only include sponsorship you have agreed with a named sponsor. England's statutory Biodiversity Net Gain does not apply in Scotland.
             </p>
 
           </div>
@@ -306,31 +318,31 @@
 
                 <div class="adv-section-label">Timber</div>
                 <div class="advanced-field">
-                  <label for="adv-yield">Timber yield (tons/ha)</label>
+                  <label for="adv-yield">Standing volume (m³ overbark/ha)</label>
                   <input type="number" class="adv-override" id="adv-yield"
                          placeholder="350" min="50" max="600" step="10">
                 </div>
                 <div class="advanced-field">
-                  <label for="adv-sitka-price">Sitka Spruce price (£/ton)</label>
+                  <label for="adv-sitka-price">Sitka Spruce standing price (£/m³ ob)</label>
                   <input type="number" class="adv-override" id="adv-sitka-price"
-                         placeholder="25" min="5" max="80" step="1">
+                         placeholder="35.17" min="5" max="80" step="1">
                 </div>
                 <div class="advanced-field">
-                  <label for="adv-scots-price">Scots Pine / Larch price (£/ton)</label>
+                  <label for="adv-scots-price">Scots Pine / Larch standing price (£/m³ ob)</label>
                   <input type="number" class="adv-override" id="adv-scots-price"
-                         placeholder="35" min="5" max="100" step="1">
+                         placeholder="35.17" min="5" max="100" step="1">
                 </div>
 
-                <div class="adv-section-label">FGS Grants</div>
+                <div class="adv-section-label">FGS Grants (used only when conditional grants are included)</div>
                 <div class="advanced-field">
                   <label for="adv-fencing-grant">Deer fencing grant (£/m)</label>
                   <input type="number" class="adv-override" id="adv-fencing-grant"
-                         placeholder="9.90" min="0" max="20" step="0.10">
+                         placeholder="9.50" min="0" max="20" step="0.10">
                 </div>
                 <div class="advanced-field">
-                  <label for="adv-restocking-grant">Restocking grant (£/ha)</label>
+                  <label for="adv-restocking-grant">Restructuring Regeneration (£/ha: 300 or 550)</label>
                   <input type="number" class="adv-override" id="adv-restocking-grant"
-                         placeholder="2400" min="0" max="6000" step="100">
+                         placeholder="550" min="0" max="6000" step="100">
                 </div>
 
                 <div class="adv-section-label">Planting Costs</div>
@@ -488,12 +500,11 @@
         <div class="result-card">
           <div class="result-card-header">
             <span class="result-card-title">15-Year Woodland Value Projection</span>
-            <span class="result-card-badge">Annual income once established</span>
+            <span class="result-card-badge">Optional scenario — no contracts in place</span>
           </div>
 
           <p class="helper-text" style="margin-bottom:12px;">
-            What your restored broadleaf woodland earns once the canopy establishes.
-            Hover over the chart for year-by-year detail.
+            Illustrative values a restored broadleaf woodland might earn if buyers are found for firewood, sporting rights or voluntary biodiversity credits. None is contracted, and none is included in the business case above.
           </p>
 
           <div id="projection-placeholder">
@@ -520,7 +531,7 @@
       <p style="font-size:0.75rem; color:var(--c-muted); line-height:1.6;">
         Indicative modelling only. Timber values and grant rates are subject to market conditions and eligibility.
         Consult a registered forestry consultant before committing to a PAWS restoration programme.
-        Grant rates as at 3 November 2026: Woodland Improvement Grant – Restructuring Regeneration (ruralpayments.org, published 1 October 2024) and Forestry Grant Scheme capital items (updated 6 October 2025). Timber reference: GB coniferous standing sales average £34.28/m³ overbark, year to September 2025 (Forest Research). Sponsorship and biodiversity-credit values are indicative assumptions; England's statutory Biodiversity Net Gain does not apply in Scotland. Last updated: 3 November 2026.
+        Grants are excluded unless you include them, and are conditional on eligibility and Scottish Forestry approval. Rates checked 3 November 2026 on ruralpayments.org: Woodland Improvement Grant – Restructuring Regeneration £300/£550 per ha (published 1 October 2024); Habitats and Species deer fence £9.50/m and rhododendron rates by method (page dated 5 July 2019). Timber is in m³ overbark standing; reference GB coniferous standing sales average £35.17/m³ overbark, year to March 2026 (Forest Research Timber Price Indices, 28 May 2026). Standing volume is a placeholder: use a site inventory. Sponsorship and the 15-year values are optional scenarios with no contracts; England's statutory Biodiversity Net Gain does not apply in Scotland. Last updated: 3 November 2026.
       </p>
 
     </main>

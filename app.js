@@ -32,8 +32,9 @@ const _state = {
   difficulty:        2,
   fencing_m:         400,
   natural_regen_pct: 40,
-  esg_per_ha:        750,
+  esg_per_ha:        0,      // optional scenario; no sponsor assumed
   hire_agent:        false,
+  include_grants:    false,  // FGS grants are conditional — excluded by default
 
   // Advanced overrides (null = use base constant)
   adv_yield:              null,  // → inputs.override_yield
@@ -90,11 +91,11 @@ function patchConstants(state, base) {
   const c = JSON.parse(JSON.stringify(base));
 
   if (state.adv_sitka_price != null)
-    c.timber.species.sitka_spruce.price_per_ton = state.adv_sitka_price;
+    c.timber.species.sitka_spruce.price_per_m3_ob = state.adv_sitka_price;
 
   if (state.adv_scots_price != null) {
-    c.timber.species.scots_pine.price_per_ton = state.adv_scots_price;
-    c.timber.species.larch.price_per_ton      = state.adv_scots_price;
+    c.timber.species.scots_pine.price_per_m3_ob = state.adv_scots_price;
+    c.timber.species.larch.price_per_m3_ob      = state.adv_scots_price;
   }
 
   if (state.adv_trees_per_ha != null)
@@ -119,6 +120,7 @@ function buildInputs(state) {
     natural_regen_pct: state.natural_regen_pct,
     esg_per_ha:        state.esg_per_ha,
     hire_agent:        state.hire_agent,
+    include_conditional_grants: state.include_grants,
     override_yield:             state.adv_yield,
     override_fencing_grant:     state.adv_fencing_grant,
     override_restocking_grant:  state.adv_restocking_grant,
@@ -138,6 +140,7 @@ function encodeURL(state) {
   p.set('regen', state.natural_regen_pct);
   p.set('esg',   state.esg_per_ha);
   p.set('agent', state.hire_agent ? '1' : '0');
+  p.set('grants', state.include_grants ? '1' : '0');
 
   // Only encode non-null overrides
   const enc = (key, val) => { if (val != null) p.set(key, val); };
@@ -174,8 +177,9 @@ function decodeURL() {
     difficulty:        clamp(pi('diff',  2),   1,   5),
     fencing_m:         clamp(pi('fence', 400), 0,   3000),
     natural_regen_pct: clamp(pi('regen', 40),  0,   100),
-    esg_per_ha:        clamp(pi('esg',   750), 0,   2500),
+    esg_per_ha:        clamp(pi('esg',   0),   0,   2500),
     hire_agent:        p.get('agent') === '1',
+    include_grants:    p.get('grants') === '1',
     adv_yield:              pN('yield'),
     adv_fencing_grant:      pN('fg'),
     adv_restocking_grant:   pN('rg'),
@@ -203,6 +207,7 @@ function applyStateToDOM(s) {
   set('input-regen',      s.natural_regen_pct);
   set('input-esg',        s.esg_per_ha);
   chk('input-agent',      s.hire_agent);
+  chk('input-grants',     s.include_grants);
 
   const noFence = s.fencing_m === 0;
   chk('input-no-fence', noFence);
@@ -231,9 +236,9 @@ function applyStateToDOM(s) {
 
 function populateAdvancedFields(c) {
   const set = (id, v) => { const e = el(id); if (e && v != null && e.value === '') e.value = v; };
-  set('adv-yield',             c.timber?.yield_tons_per_ha);
-  set('adv-sitka-price',       c.timber?.species?.sitka_spruce?.price_per_ton);
-  set('adv-scots-price',       c.timber?.species?.scots_pine?.price_per_ton);
+  set('adv-yield',             c.timber?.yield_m3_ob_per_ha ?? c.timber?.yield_tons_per_ha);
+  set('adv-sitka-price',       c.timber?.species?.sitka_spruce?.price_per_m3_ob ?? c.timber?.species?.sitka_spruce?.price_per_ton);
+  set('adv-scots-price',       c.timber?.species?.scots_pine?.price_per_m3_ob ?? c.timber?.species?.scots_pine?.price_per_ton);
   set('adv-fencing-grant',     c.fgs_grants?.deer_fencing_grant_per_m);
   set('adv-restocking-grant',  c.fgs_grants?.restocking_grant_per_ha);
   set('adv-trees-per-ha',      c.costs?.trees_per_ha);
@@ -374,12 +379,12 @@ function renderBreakdown(r) {
           <td colspan="2">Income</td>
         </tr>
         ${row('Timber sale', r.timber_revenue, r.timber_revenue >= 0 ? 'var(--c-positive)' : 'var(--c-negative)')}
-        ${row('FGS grants total', r.fgs_total, 'var(--c-positive)')}
-        ${sub('Deer fencing grant',        r.fgs_breakdown.fencing_grant)}
-        ${sub('Tree protection (stakes)',   r.fgs_breakdown.tree_protection_grant)}
-        ${sub('Restocking grant',          r.fgs_breakdown.restocking_grant)}
-        ${sub('Rhododendron clearance',    r.fgs_breakdown.rhododendron_grant)}
-        ${row('Private nature sponsorship (indicative)', r.esg_income, 'var(--c-positive)')}
+        ${row(_state.include_grants ? 'FGS grants (conditional — only if eligible and approved)' : 'FGS grants (excluded — not confirmed)', r.fgs_total, 'var(--c-positive)')}
+        ${sub('Deer fencing (Habitats and Species route)', r.fgs_breakdown.fencing_grant)}
+        ${sub('Tree protection (no item confirmed)',       r.fgs_breakdown.tree_protection_grant)}
+        ${sub('Restructuring Regeneration',                r.fgs_breakdown.restocking_grant)}
+        ${sub('Rhododendron control (site rate needed)',   r.fgs_breakdown.rhododendron_grant)}
+        ${row('Private sponsorship (optional scenario)', r.esg_income, 'var(--c-positive)')}
         <tr class="subtotal-row">
           <td>Gross inflow</td>
           <td class="val">${fmt(r.gross_inflow)}</td>
@@ -565,21 +570,20 @@ function renderProjection(r) {
   const xLabels = years.map(yr => `Yr${yr.year}`);
 
   lineChart('chart-projection', xLabels, [
-    { label: 'Firewood / Biomass',  color: CHART_COLORS.timber, values: years.map(y => y.firewood)        },
-    { label: 'Sporting Rights',     color: CHART_COLORS.fgs,    values: years.map(y => y.sporting)        },
-    { label: 'Natural Capital',     color: CHART_COLORS.sweat,  values: years.map(y => y.natural_capital) },
-    { label: 'Biodiversity credits (indicative)',         color: CHART_COLORS.esg,    values: years.map(y => y.bng)             },
+    { label: 'Firewood / biomass (scenario)',  color: CHART_COLORS.timber, values: years.map(y => y.firewood) },
+    { label: 'Sporting rights (scenario)',     color: CHART_COLORS.fgs,    values: years.map(y => y.sporting) },
+    { label: 'Voluntary biodiversity credits (scenario)', color: CHART_COLORS.esg, values: years.map(y => y.bng) },
   ], 'legend-projection');
 
   const yr15 = years[14];
   statsEl.innerHTML = `
     <div class="stat-boxes">
       <div class="stat-box">
-        <div class="stat-box-label">Year 15 annual value</div>
+        <div class="stat-box-label">Year 15 annual value (scenario)</div>
         <div class="stat-box-value">${fmt(yr15.total)}<span style="font-size:.7em;color:var(--c-muted);font-weight:400;">/yr</span></div>
       </div>
       <div class="stat-box">
-        <div class="stat-box-label">15-year cumulative</div>
+        <div class="stat-box-label">15-year cumulative (scenario)</div>
         <div class="stat-box-value">${fmt(r.projection_15yr_total)}</div>
       </div>
       <div class="stat-box">
@@ -712,6 +716,12 @@ function initInputEvents() {
   // ESG slider
   el('input-esg')?.addEventListener('input', () => {
     _state.esg_per_ha = parseInt(el('input-esg').value, 10) || 0;
+    runCalculation();
+  });
+
+  // Conditional grants toggle
+  el('input-grants')?.addEventListener('change', () => {
+    _state.include_grants = el('input-grants').checked;
     runCalculation();
   });
 

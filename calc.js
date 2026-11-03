@@ -20,12 +20,15 @@ export function timberRevenue(inputs, constants) {
   const { hectares, species, difficulty, override_yield } = inputs;
   const t = constants.timber;
 
-  const yieldPerHa     = override_yield ?? t.yield_tons_per_ha;
-  const pricePerTon    = t.species[species]?.price_per_ton ?? 25;
+  // v2.1 constants: standing volume in m³ overbark/ha and standing-sales £/m³ ob
+  // (Forest Research Timber Price Indices units). v1/v2.0 used tons; kept as a fallback.
+  const yieldPerHa     = override_yield ?? t.yield_m3_ob_per_ha ?? t.yield_tons_per_ha;
+  const sp             = t.species[species];
+  const pricePerUnit   = sp?.price_per_m3_ob ?? sp?.price_per_ton ?? 25;
   const penalty        = t.difficulty_penalty_per_ton[String(difficulty)] ?? 0;
-  const netPricePerTon = pricePerTon - penalty;
+  const netPrice       = pricePerUnit - penalty;
 
-  return hectares * yieldPerHa * netPricePerTon;
+  return hectares * yieldPerHa * netPrice;
 }
 
 // ─────────────────────────────────────────────────
@@ -33,12 +36,15 @@ export function timberRevenue(inputs, constants) {
 // ─────────────────────────────────────────────────
 
 /**
- * FGS grant breakdown.
+ * FGS grant breakdown. All grants are CONDITIONAL: they are counted only when
+ * inputs.include_conditional_grants is true (the app defaults it to false).
  *
- * Restocking grant is pro-rated:
- *   • Active-planting portion  → full rate × active_fraction
- *   • Natural-regen portion    → full rate × regen_fraction × natural_regen_discount (0.7)
- * Rhododendron clearance always applies to 100% of site ha.
+ * Restocking grant (WIG Restructuring Regeneration, £300 or £550/ha tier):
+ *   • Active-planting portion  → tier rate × active_fraction
+ *   • Natural-regen portion    → natural_regen_grant_per_ha × regen_fraction
+ *     (v2.1 default £0; legacy constants used rate × natural_regen_discount)
+ * Rhododendron clearance: rate per ha × site ha (v2.1 default £0; real rates are
+ * per ha of infested land by method — enter a site-specific rate).
  *
  * @returns {{ fencing_grant, tree_protection_grant, restocking_grant,
  *             rhododendron_grant, total_fgs }}
@@ -48,6 +54,11 @@ export function fgsGrants(inputs, constants) {
           override_fencing_grant, override_restocking_grant } = inputs;
   const g = constants.fgs_grants;
   const c = constants.costs;
+
+  if (!inputs.include_conditional_grants) {
+    return { fencing_grant: 0, tree_protection_grant: 0, restocking_grant: 0,
+             rhododendron_grant: 0, total_fgs: 0 };
+  }
 
   const activeFraction  = (100 - natural_regen_pct) / 100;
   const regenFraction   = natural_regen_pct / 100;
@@ -63,7 +74,9 @@ export function fgsGrants(inputs, constants) {
   // Restocking grant — pro-rated by planting method
   const restockingRate  = override_restocking_grant ?? g.restocking_grant_per_ha;
   const activePart      = hectares * activeFraction * restockingRate;
-  const regenPart       = hectares * regenFraction  * restockingRate * g.natural_regen_discount;
+  const regenRate       = g.natural_regen_grant_per_ha
+                        ?? (g.natural_regen_discount != null ? restockingRate * g.natural_regen_discount : 0);
+  const regenPart       = hectares * regenFraction  * regenRate;
   const restocking_grant = activePart + regenPart;
 
   // Rhododendron / invasive clearance — always 100% of site

@@ -27,7 +27,7 @@ function pct(a, b, tol = 0.5)  { return Math.abs(a - b) <= tol; }
 // ── TC1: Default 4ha Sitka, diff=1, 400m fence, 40% regen ──────────────────
 
 console.log('\n=== TC1: Default 4ha Sitka, diff=1, 400m fence, 40% regen ===');
-const tc1 = { hectares:4, species:'sitka_spruce', difficulty:1, fencing_m:400,
+const tc1 = { include_conditional_grants:true, hectares:4, species:'sitka_spruce', difficulty:1, fencing_m:400,
                natural_regen_pct:40, esg_per_ha:750, hire_agent:false,
                override_yield:null, override_fencing_grant:null, override_restocking_grant:null };
 const r1 = calculate(tc1, constants);
@@ -56,7 +56,7 @@ assert(r1.breakeven_status === 'POSITIVE',                'TC1 breakeven POSITIV
 // ── TC2: Difficulty 5 Sitka — timber negative, grants rescue ───────────────
 
 console.log('\n=== TC2: Difficulty 5 Sitka — timber negative, grants rescue ===');
-const tc2 = { hectares:4, species:'sitka_spruce', difficulty:5, fencing_m:400,
+const tc2 = { include_conditional_grants:true, hectares:4, species:'sitka_spruce', difficulty:5, fencing_m:400,
                natural_regen_pct:40, esg_per_ha:750, hire_agent:false,
                override_yield:null, override_fencing_grant:null, override_restocking_grant:null };
 const r2 = calculate(tc2, constants);
@@ -70,7 +70,7 @@ assert(r2.breakeven_status === 'GRANTS_NEEDED',  'TC2 breakeven GRANTS_NEEDED', 
 // ── TC3: Larch diff=1 — peak timber value ──────────────────────────────────
 
 console.log('\n=== TC3: Larch diff=1 — peak timber value ===');
-const tc3 = { hectares:4, species:'larch', difficulty:1, fencing_m:400,
+const tc3 = { include_conditional_grants:true, hectares:4, species:'larch', difficulty:1, fencing_m:400,
                natural_regen_pct:40, esg_per_ha:750, hire_agent:false,
                override_yield:null, override_fencing_grant:null, override_restocking_grant:null };
 const r3 = calculate(tc3, constants);
@@ -84,7 +84,7 @@ assert(r3.net_year1_contractor > r1.net_year1_contractor, 'TC3 Larch > Sitka net
 // ── TC4: Zero fencing ──────────────────────────────────────────────────────
 
 console.log('\n=== TC4: Zero fencing ===');
-const tc4 = { hectares:4, species:'sitka_spruce', difficulty:2, fencing_m:0,
+const tc4 = { include_conditional_grants:true, hectares:4, species:'sitka_spruce', difficulty:2, fencing_m:0,
                natural_regen_pct:40, esg_per_ha:0, hire_agent:false,
                override_yield:null, override_fencing_grant:null, override_restocking_grant:null };
 const r4 = calculate(tc4, constants);
@@ -98,7 +98,7 @@ assert(near(r4.net_year1_contractor, 41008),    'TC4 net_year1_contractor no fen
 // ── TC5: 100% natural regen — zero planting ────────────────────────────────
 
 console.log('\n=== TC5: 100% natural regen — zero planting ===');
-const tc5 = { hectares:4, species:'sitka_spruce', difficulty:2, fencing_m:400,
+const tc5 = { include_conditional_grants:true, hectares:4, species:'sitka_spruce', difficulty:2, fencing_m:400,
                natural_regen_pct:100, esg_per_ha:0, hire_agent:false,
                override_yield:null, override_fencing_grant:null, override_restocking_grant:null };
 const r5 = calculate(tc5, constants);
@@ -113,7 +113,7 @@ assert(near(r5.net_year1_contractor, 39880),         'TC5 net_year1_contractor',
 // ── TC6: Agent hired — fee reduces net ─────────────────────────────────────
 
 console.log('\n=== TC6: Agent hired — fee reduces net ===');
-const tc6 = { hectares:4, species:'sitka_spruce', difficulty:2, fencing_m:400,
+const tc6 = { include_conditional_grants:true, hectares:4, species:'sitka_spruce', difficulty:2, fencing_m:400,
                natural_regen_pct:40, esg_per_ha:750, hire_agent:true,
                override_yield:null, override_fencing_grant:null, override_restocking_grant:null };
 const r6 = calculate(tc6, constants);
@@ -126,7 +126,7 @@ assert(r6.net_year1_contractor < r1.net_year1_contractor, 'TC6 agent reduces net
 // ── TC7: Minimum site 0.5ha ────────────────────────────────────────────────
 
 console.log('\n=== TC7: Minimum site 0.5ha ===');
-const tc7 = { hectares:0.5, species:'scots_pine', difficulty:3, fencing_m:100,
+const tc7 = { include_conditional_grants:true, hectares:0.5, species:'scots_pine', difficulty:3, fencing_m:100,
                natural_regen_pct:50, esg_per_ha:500, hire_agent:false,
                override_yield:null, override_fencing_grant:null, override_restocking_grant:null };
 const r7 = calculate(tc7, constants);
@@ -140,7 +140,7 @@ assert(isFinite(r7.net_year1_contractor),       'TC7 no Infinity at boundary',  
 // ── TC8: Maximum site 20ha ─────────────────────────────────────────────────
 
 console.log('\n=== TC8: Maximum site 20ha ===');
-const tc8 = { hectares:20, species:'mixed_conifer', difficulty:2, fencing_m:1800,
+const tc8 = { include_conditional_grants:true, hectares:20, species:'mixed_conifer', difficulty:2, fencing_m:1800,
                natural_regen_pct:20, esg_per_ha:1000, hire_agent:false,
                override_yield:null, override_fencing_grant:null, override_restocking_grant:null };
 const r8 = calculate(tc8, constants);
@@ -201,20 +201,40 @@ for (let i = 0; i < allResults.length; i++) {
 // ── Summary ────────────────────────────────────────────────────────────────
 
 
-// ── Live constants (v2.0) sanity checks ─────────────────────────────────────
-console.log('\n=== Live constants v2.0 ===');
-assert(live.version === '2.0', 'live version is 2.0', '2.0', live.version);
-assert(live.fgs_grants.restocking_grant_per_ha === 550, 'restocking = WIG Restructuring Regeneration £550/ha', 550, live.fgs_grants.restocking_grant_per_ha);
+// ── Live constants (v2.1) sanity checks ─────────────────────────────────────
+console.log('\n=== Live constants v2.1 ===');
+assert(live.version === '2.1', 'live version is 2.1', '2.1', live.version);
+assert(live.fgs_grants.restocking_grant_per_ha === 550, 'restocking = WIG Restructuring Regeneration £550/ha tier', 550, live.fgs_grants.restocking_grant_per_ha);
+assert(JSON.stringify(live.fgs_grants.restocking_grant_tiers_per_ha) === '[300,550]', 'restocking tiers 300/550', '[300,550]', JSON.stringify(live.fgs_grants.restocking_grant_tiers_per_ha));
+assert(!live.fgs_grants.natural_regen_discount, 'unsourced 0.7 natural-regen factor removed (legacy alias 0)', 0, live.fgs_grants.natural_regen_discount);
+assert(live.fgs_grants.natural_regen_grant_per_ha === 0, 'natural regen grant £0 unless confirmed', 0, live.fgs_grants.natural_regen_grant_per_ha);
+assert(live.fgs_grants.rhododendron_clearance_per_ha === 0, 'no generic rhododendron rate', 0, live.fgs_grants.rhododendron_clearance_per_ha);
+assert(live.fgs_grants.tree_protection_per_tree === 0, 'no tree-protection item assumed', 0, live.fgs_grants.tree_protection_per_tree);
+assert(live.fgs_grants.deer_fencing_grant_per_m === 9.5, 'deer fence £9.50/m (Habitats and Species)', 9.5, live.fgs_grants.deer_fencing_grant_per_m);
+assert(live.esg.default_per_ha === 0, 'ESG default £0 (optional scenario)', 0, live.esg.default_per_ha);
 assert(live.esg.min_per_ha <= live.esg.default_per_ha && live.esg.default_per_ha <= live.esg.max_per_ha,
   'ESG default within min–max', `${live.esg.min_per_ha}–${live.esg.max_per_ha}`, live.esg.default_per_ha);
-assert(!!live.metadata?.sources && !!live.metadata?.last_updated, 'metadata has sources and last_updated');
+assert(live.long_term_values.natural_capital_audit_per_ha_yr === 0, 'natural-capital audit removed as income', 0, live.long_term_values.natural_capital_audit_per_ha_yr);
+assert(live.timber.yield_m3_ob_per_ha === 350 && live.timber.species.sitka_spruce.price_per_m3_ob === 35.17, 'timber in m³ ob and £/m³ ob', '350 / 35.17', `${live.timber.yield_m3_ob_per_ha} / ${live.timber.species.sitka_spruce.price_per_m3_ob}`);
+assert(!!live.metadata?.sources && !!live.metadata?.last_updated && !!live.metadata?.grant_status, 'metadata has sources, grant_status and last_updated');
 {
-  const rl = calculate({ hectares:4, species:'sitka_spruce', difficulty:1, fencing_m:400,
-    natural_regen_pct:40, esg_per_ha:750, hire_agent:false,
-    override_yield:null, override_fencing_grant:null, override_restocking_grant:null }, live);
-  // 4 ha: 60% planted × 550 + 40% regen × 550 × 0.7 = 1320 + 616
-  assert(near(rl.fgs_breakdown.restocking_grant, 1936), 'live: restocking grant 4 ha = £1,936', 1936, rl.fgs_breakdown.restocking_grant);
-  assert(near(rl.fgs_breakdown.tree_protection_grant, 9600), 'live: tree protection 4,800 trees × £2.00', 9600, rl.fgs_breakdown.tree_protection_grant);
+  const base = { hectares:4, species:'sitka_spruce', difficulty:1, fencing_m:400,
+    natural_regen_pct:40, esg_per_ha:0, hire_agent:false,
+    override_yield:null, override_fencing_grant:null, override_restocking_grant:null };
+  const def = calculate(base, live);
+  assert(def.fgs_total === 0, 'live default: grants excluded (£0)', 0, def.fgs_total);
+  assert(def.esg_income === 0, 'live default: no sponsorship', 0, def.esg_income);
+  assert(near(def.timber_revenue, 49238), 'live: timber 4 ha × 350 m³ × £35.17 = £49,238', 49238, def.timber_revenue);
+  const g = calculate({ ...base, include_conditional_grants: true }, live);
+  // 4 ha: 60% planted × £550 = £1,320; regen part £0
+  assert(near(g.fgs_breakdown.restocking_grant, 1320), 'live grants on: restocking 4 ha = £1,320', 1320, g.fgs_breakdown.restocking_grant);
+  assert(near(g.fgs_breakdown.fencing_grant, 3800), 'live grants on: deer fence 400 m × £9.50', 3800, g.fgs_breakdown.fencing_grant);
+  assert(g.fgs_breakdown.tree_protection_grant === 0 && g.fgs_breakdown.rhododendron_grant === 0, 'live grants on: no tree protection or rhododendron by default');
+  assert(near(g.fgs_total, 5120), 'live grants on: total £5,120', 5120, g.fgs_total);
+  const t300 = calculate({ ...base, include_conditional_grants: true, override_restocking_grant: 300 }, live);
+  assert(near(t300.fgs_breakdown.restocking_grant, 720), 'live: £300 tier → £720 on 4 ha', 720, t300.fgs_breakdown.restocking_grant);
+  const yr15 = def.projection[14];
+  assert(yr15.natural_capital === 0, 'live: projection has no audit income', 0, yr15.natural_capital);
 }
 console.log(`\n${ failed === 0 ? '✓' : '✗' } ${passed} passed · ${failed} failed\n`);
 if (failed > 0) process.exit(1);
