@@ -1,7 +1,7 @@
 {
-  "name": "PAWS Business Case Modeller",
-  "short_name": "PAWS Modeller",
-  "description": "Model the financial case for ancient woodland restoration in Fife. NFCA.",
+  "name": "Woodland Restoration Calculator",
+  "short_name": "Woodland Calc",
+  "description": "Model the financial case for woodland and hedgerow restoration in Scotland. NFCA.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#faf7f0",

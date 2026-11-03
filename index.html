@@ -3,15 +3,15 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>PAWS Business Case Modeller — NFCA</title>
-  <meta name="description" content="Calculate the financial case for restoring Plantations on Ancient Woodland Sites in Fife. Timber sales, grants, ESG funding and sweat equity modelled in one tool.">
+  <title>Woodland Restoration Calculator — NFCA</title>
+  <meta name="description" content="Calculate the financial case for woodland and hedgerow restoration in Scotland — PAWS, native woodland, new native woodland, wood pasture, agroforestry and hedgerows. FGS and AECS grants, timber, ESG funding and sweat equity modelled in one tool.">
 
   <!-- PWA -->
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#1a3d2b">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="PAWS Modeller">
+  <meta name="apple-mobile-web-app-title" content="Woodland Calc">
   <link rel="apple-touch-icon" href="icons/icon-192.svg">
 
   <!-- Styles -->
@@ -23,8 +23,8 @@
   <div id="loading-overlay" role="status" aria-live="polite">
     <div class="loading-inner">
       <div class="loading-icon">🌲</div>
-      <h2>Loading PAWS data…</h2>
-      <p>Scottish Forestry Grant Scheme 2024 constants</p>
+      <h2>Loading woodland data…</h2>
+      <p>Forestry Grant Scheme and AECS rate constants</p>
     </div>
   </div>
 
@@ -43,7 +43,7 @@
         <span class="header-logo-fallback" style="display:none;">NFCA</span>
         <div>
           <div class="header-title">
-            PAWS Business Case Modeller
+            Woodland Restoration Calculator
             <span>North Fife Community Arborist</span>
           </div>
         </div>
@@ -53,7 +53,7 @@
       </a>
     </div>
     <div class="header-subtitle" aria-label="Programme context">
-      Fife Ancient Woodland &nbsp;·&nbsp; Scottish Forestry Grant Scheme &nbsp;·&nbsp; NatureScot AWI
+      Scottish Woodland &amp; Hedgerow Restoration &nbsp;·&nbsp; Forestry Grant Scheme &nbsp;·&nbsp; AECS
     </div>
   </header>
 
@@ -544,12 +544,12 @@
 
       <div class="results-header">
         <h2>Your Financial Case</h2>
-        <p>Adjust the controls on the left to model your specific PAWS site.</p>
+        <p>Adjust the controls on the left to model your specific site.</p>
       </div>
 
       <!-- Sister tool contextual nudge — hectares value updated by app.js -->
       <div class="sister-nudge" id="sister-nudge" style="display:none;" aria-live="polite">
-        Restoring this <strong id="nudge-hectares">—</strong> ha PAWS block?
+        Restoring this <strong id="nudge-size">—</strong> site?
         Consider deploying ShieldBelt agroforestry margins alongside for additional income.
         <a href="https://fife-shieldbelt-toolkit.siho.workers.dev" target="_blank" rel="noopener" class="sister-nudge-link">
           Open ShieldBelt Calculator →
@@ -692,8 +692,8 @@
       <div class="divider"></div>
       <p style="font-size:0.75rem; color:var(--c-muted); line-height:1.6;">
         Indicative modelling only. Timber values, grant rates and carbon prices subject to market conditions and eligibility.
-        Consult a registered forestry consultant before committing to a PAWS restoration programme.
-        Grant figures based on Scottish Forestry Grant Scheme (SFGS) 2024–25 indicative rates.
+        Consult a registered forestry consultant or agricultural adviser before committing to a restoration programme.
+        Grant figures are published Forestry Grant Scheme (FGS) and Agri-Environment Climate Scheme (AECS) rates, checked November 2026 and flagged for verification. Cost rates are estimates.
       </p>
 
     </main>
@@ -704,7 +704,7 @@
   ═══════════════════════════════════════════ -->
   <footer class="site-footer" role="contentinfo">
     <div class="footer-inner">
-      <span class="footer-copy">PAWS Business Case Modeller &mdash; North Fife Community Arborist</span>
+      <span class="footer-copy">Woodland Restoration Calculator &mdash; North Fife Community Arborist</span>
       <a href="https://fife-shieldbelt-toolkit.siho.workers.dev"
          class="footer-link"
          target="_blank"

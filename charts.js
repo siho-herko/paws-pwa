@@ -1,5 +1,5 @@
 /**
- * charts.js — Zero-dependency canvas charts for PAWS modeller
+ * charts.js — Zero-dependency canvas charts for the Woodland Restoration Calculator
  * Uses HTML5 Canvas 2D API only — no external libraries.
  *
  * Chart colour palette (per Prompt 4 spec):
@@ -385,15 +385,15 @@ export function htmlLegend(legendId, datasets) {
 // ─────────────────────────────────────────────────
 
 function _attachLineTooltip(canvas, { xPos, xLabels, stacks, datasets, n }) {
-  if (canvas._pawsTooltipMove) {
-    canvas.removeEventListener('mousemove',  canvas._pawsTooltipMove);
-    canvas.removeEventListener('mouseleave', canvas._pawsTooltipHide);
-    canvas.removeEventListener('touchmove',  canvas._pawsTooltipMove);
+  if (canvas._chartTooltipMove) {
+    canvas.removeEventListener('mousemove',  canvas._chartTooltipMove);
+    canvas.removeEventListener('mouseleave', canvas._chartTooltipHide);
+    canvas.removeEventListener('touchmove',  canvas._chartTooltipMove);
   }
 
   const tip = getTooltip();
 
-  canvas._pawsTooltipMove = (e) => {
+  canvas._chartTooltipMove = (e) => {
     const rect   = canvas.getBoundingClientRect();
     const clientX = e.touches ? e.touches[0].clientX : e.clientX;
     const clientY = e.touches ? e.touches[0].clientY : e.clientY;
@@ -430,11 +430,11 @@ function _attachLineTooltip(canvas, { xPos, xLabels, stacks, datasets, n }) {
     tip.style.top     = (clientY - 12) + 'px';
   };
 
-  canvas._pawsTooltipHide = () => { tip.style.display = 'none'; };
+  canvas._chartTooltipHide = () => { tip.style.display = 'none'; };
 
-  canvas.addEventListener('mousemove',  canvas._pawsTooltipMove);
-  canvas.addEventListener('mouseleave', canvas._pawsTooltipHide);
-  canvas.addEventListener('touchmove',  canvas._pawsTooltipMove, { passive: true });
+  canvas.addEventListener('mousemove',  canvas._chartTooltipMove);
+  canvas.addEventListener('mouseleave', canvas._chartTooltipHide);
+  canvas.addEventListener('touchmove',  canvas._chartTooltipMove, { passive: true });
 }
 
 // ─────────────────────────────────────────────────

@@ -1,9 +1,10 @@
-// db.js — IndexedDB layer for PAWS constants
+// db.js — IndexedDB layer for Woodland Restoration Calculator constants
 
-const DB_NAME    = 'PAWSModeller';
+const DB_NAME    = 'WoodlandRestorationCalculator';
+const LEGACY_DB  = 'PAWSModeller';
 const DB_VERSION = 1;
 const STORE      = 'constants';
-const RECORD_ID  = 'constants_v2';
+const RECORD_ID  = 'woodland_v2';
 const SEED_URL   = './data/constants.json';
 
 // ─────────────────────────────────────────────────
@@ -24,7 +25,7 @@ function _openRaw() {
 
     req.onsuccess  = (event) => resolve(event.target.result);
     req.onerror    = (event) => reject(event.target.error);
-    req.onblocked  = ()      => reject(new Error('PAWS DB: open blocked by another tab'));
+    req.onblocked  = ()      => reject(new Error('Woodland DB: open blocked by another tab'));
   });
 }
 
@@ -49,11 +50,11 @@ function _putRecord(db, data) {
 async function _seed(db) {
   const response = await fetch(SEED_URL);
   if (!response.ok) {
-    throw new Error(`PAWS DB: failed to fetch seed file (${response.status})`);
+    throw new Error(`Woodland DB: failed to fetch seed file (${response.status})`);
   }
   const constants = await response.json();
   await _putRecord(db, constants);
-  console.info('PAWS DB seeded from constants.json');
+  console.info('Woodland DB seeded from constants.json');
   return constants;
 }
 
@@ -72,11 +73,14 @@ let _db = null;
 export async function openDB() {
   if (_db) return _db;
 
+  // Best-effort removal of the pre-2.0 PAWS-only database
+  try { indexedDB.deleteDatabase(LEGACY_DB); } catch { /* ignore */ }
+
   _db = await _openRaw();
   const existing = await _getRecord(_db);
 
   if (existing) {
-    console.info('PAWS DB: loaded existing constants');
+    console.info('Woodland DB: loaded existing constants');
   } else {
     await _seed(_db);
   }
@@ -86,7 +90,7 @@ export async function openDB() {
 
 /**
  * getConstants()
- * Returns the full constants object (single record, id='paws_v1').
+ * Returns the full constants object (single record, id='woodland_v2').
  */
 export async function getConstants() {
   const db     = await openDB();
@@ -94,7 +98,7 @@ export async function getConstants() {
 
   if (!record) {
     // Shouldn't happen after openDB() seeds, but guard anyway
-    throw new Error('PAWS DB: constants record missing — try resetConstants()');
+    throw new Error('Woodland DB: constants record missing — try resetConstants()');
   }
 
   // Return a copy without the internal 'id' key
@@ -110,7 +114,7 @@ export async function getConstants() {
 export async function saveConstants(constants) {
   const db = await openDB();
   await _putRecord(db, constants);
-  console.info('PAWS DB: constants saved (user overrides applied)');
+  console.info('Woodland DB: constants saved (user overrides applied)');
 }
 
 /**
@@ -120,7 +124,7 @@ export async function saveConstants(constants) {
 export async function resetConstants() {
   const db = await openDB();
   await _seed(db);
-  console.info('PAWS DB: constants reset to seed defaults');
+  console.info('Woodland DB: constants reset to seed defaults');
 }
 
 /**

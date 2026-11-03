@@ -1,5 +1,5 @@
 /**
- * app.js — PAWS Business Case Modeller
+ * app.js — Woodland Restoration Calculator
  * Main application controller
  *
  * Architecture:
@@ -442,10 +442,10 @@ function updateLiveLabels(s) {
   el('agent-fee-notice')?.classList.toggle('visible', s.hire_agent);
 
   // Sister tool nudge — show once a calculation is in progress, with live size
-  const nudge   = el('sister-nudge');
-  const nudgeHa = el('nudge-hectares');
-  if (nudge)   nudge.style.display = 'block';
-  if (nudgeHa) nudgeHa.textContent = s.hectares.toFixed(1);
+  const nudge     = el('sister-nudge');
+  const nudgeSize = el('nudge-size');
+  if (nudge)     nudge.style.display = 'block';
+  if (nudgeSize) nudgeSize.textContent = isLinear() ? fmtM(s.length_m) : s.hectares.toFixed(1) + ' ha';
 }
 
 // ─────────────────────────────────────────────────
@@ -1064,7 +1064,7 @@ function registerServiceWorker() {
 function init() {
   showOverlay();       // synchronous — browser can paint before first await
   _initAsync().catch(err => {
-    console.error('PAWS init error:', err);
+    console.error('Woodland calculator init error:', err);
     hideOverlay();
   });
 }
@@ -1117,7 +1117,7 @@ init();
 // DevTools test helper
 // ─────────────────────────────────────────────────
 
-window.pawsTest = async (overrides = {}) => {
+window.woodlandTest = async (overrides = {}) => {
   const inputs = { ...buildInputs(_state), ...overrides };
   const c      = patchConstants({ ..._state, ...overrides }, _constants);
   const r      = calculate(inputs, c);
@@ -1132,3 +1132,4 @@ window.pawsTest = async (overrides = {}) => {
   });
   return r;
 };
+window.pawsTest = window.woodlandTest;
