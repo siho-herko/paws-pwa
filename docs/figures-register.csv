@@ -1,0 +1,33 @@
+figure,value,unit,basis_or_source,source_date,label,pages
+Carbon price (default),70,GBP per tCO2e,ONCRA central range £60–80 (G. Tolmeijer email); Si chose £70,2026-10,CITED + SI,calculator; resilience-fife; sources block all microsites
+Carbon price slider range,20–150,GBP per tCO2e,Si decision 3 Nov 2026; £150 = upside case,2026-11-03,SI,calculator
+WCC price reference,about 28,GBP per tCO2e,Woodland Carbon Code PIU volume-weighted average £28.32 (woodlandcarboncode.org.uk/UK-carbon-prices),2025-03-20,CITED,calculator note; microsite sources
+ONCRA net factor,0.64,ratio of gross,20% GHG default (LSC Protocol v2 §2.1.6) × 20% buffer = 15% holding + 5% pool (Guidelines Mar 2026 §5.6),2026-03,VERIFIED,calculator (calc.js; db v10 sserGrossUnitsPerKm); microsites
+ONCRA claims,contribution claims only,—,Potential (ex-ante) units = contribution claims; ONCRA not CCP-eligible (Guidelines §5.4–5.5; ICVCM status checked Oct 2026),2026-10,VERIFIED,calculator; microsite sources
+Dense Wildlife Hedge 3m carbon,53.4,tCO2e per km over 50 yr (gross),Hedge model set 3/4 (HedgeCarbon.xlsx row 20: triennial 2.8 m × 2 m; layered yr 15) 178.0 tCO2e/ha × 0.3 ha/km,2026-04 (model); 2026-11-03 (applied),JUDGEMENT (mapping) on unsourced model; cross-checked Drexler 2021; Axe 2017,calculator (db v10); microsites
+Heritage Species Hedge 3m carbon,59.3,tCO2e per km over 50 yr (gross),Hedge model set 3/4 (HedgeCarbon.xlsx row 23: triennial 3.6 m × 3.6 m; layered yr 15) 197.6 tCO2e/ha × 0.3 ha/km,2026-04 (model); 2026-11-03 (applied),JUDGEMENT (mapping) on unsourced model,calculator; microsites
+Productive Hedge 4.2m carbon (programme),84.5,tCO2e per km over 50 yr (gross),Hedgerow Carbon Sequestration.xlsx (set 3) row 24,2026-03-24,unsourced model,programme model (not on public pages)
+Non-hedge variant carbon,8.4–806.4,tCO2e per km over 50 yr,v9 indicative profiles retained in db v10 (some already include a legacy 15% deduction),2026-04-24,INDICATIVE (unvalidated),calculator; microsites
+Grass / coppice / woodland per-ha figures (510; 382.5; 127.5; 58.4/ha),REMOVED,—,DBIRP v1–v3 profile set; unit never settled; fabricated comparators in DBIRP Session 1,2026-04,WITHDRAWN,removed from microsites 3 Nov 2026
+Income forgone method,area × GM × 0.7,GBP per km per yr (rounded £10),SAC Consulting / FAS Farm Management Handbook Feb 2026 chapter updates; 0.7 edge factor = JUDGEMENT; Si decision,2026-02 (FMH); 2026-11-03,CITED + JUDGEMENT + SI,calculator (db v10 farmImpacts); microsites
+Gross margin Cereals,953,GBP per ha,mean of WW £1,140; SB £713; WB £1,007 (FMH Feb 2026 arable update; feed prices),2026-02,CITED,db v10
+Gross margin General Cropping,989,GBP per ha,mean incl. WOSR £1,094; excludes potatoes/veg (likely low),2026-02,CITED + JUDGEMENT,db v10
+Gross margin Dairy,3633,GBP per forage ha,FMH Feb 2026 dairy update; moderate input 7,000 L,2026-02,CITED,db v10
+Gross margin LFA,685,GBP per forage ha,mean of hill suckler spring ~531 and autumn ~713 (derived) and Improved Hill ewes 120% £812 (FMH Feb 2026),2026-02,CITED (partly derived),db v10
+Income forgone 3m hedge,200 / 210 / 760 / 140,GBP per km per yr (Cereals / GC / Dairy / LFA),derived (0.3 ha/km),2026-11-03,DERIVED,calculator; microsites
+Productive Hedge farmer payment,300,GBP per km per yr,programme decision (productive-hedge-farmer-cost.md),2026-10,SI,programme (shown separately from income forgone)
+Network target (Fife),2000,km of new hedge by 2046,programme model (FCCT_Landscape_Programme_Forecast.xlsx); rounded,2026-10-22,SI,resilience-fife; sources blocks
+Network indicative capacity (Fife),about 1900 (550/400/330/280/220/150),km,legacy biome capacity estimates; method not documented,2026-04,INDICATIVE (unsourced),resilience-fife
+East Neuk potential network,330,km,legacy estimate (East_Neuk_Capacity_Estimates_Revised.csv); method not documented,2026-04-11,INDICATIVE (unsourced),resilience-east-neuk; resilience-dreel-burn
+Dreel Burn demonstration,about 50 km; 16 farms,km,programme model,2026-10,SI,resilience-dreel-burn
+Network £/yr totals (£2.5M+; £820k+; biome £),REMOVED,—,no source; built on superseded £16/km income forgone,—,WITHDRAWN (Si 3 Nov 2026),removed from microsites
+Pollination / windbreak / thermal / avoided chemical values,e.g. 1200 / 960 / 250 / 150,GBP per km per yr,Fife intervention database (CREW CRW2024/04 and others); method per Methodology Session 3,2026-04,INDICATIVE (under review),calculator; microsites
+CREW water values (riparian),e.g. 10791–12800,GBP per km per yr,Fife intervention database derived from CREW CRW2024/04,2026-04,INDICATIVE (under review),calculator; resilience-east-neuk; resilience-fife
+PAWS restocking grant,550,GBP per ha,Woodland Improvement Grant – Restructuring Regeneration (Delivering Diversity and Resilience Woodland) ruralpayments.org; replaces £2,400,2024-10-01,CITED,woodland restoration app (paws_constants v2.0)
+PAWS deer fence grant,9.90,GBP per m,FGS capital item high-cost deer fence (ruralpayments.org Woodland Creation page); eligibility with restocking to confirm,2025-10-06,CITED (eligibility unconfirmed),woodland restoration app
+PAWS tree shelter grant,2.00,GBP per tree,FGS capital item tree shelter 1.2–1.8 m; eligibility with restocking to confirm,2025-10-06,CITED (eligibility unconfirmed),woodland restoration app
+PAWS rhododendron clearance,1500,GBP per ha,not verified (WIG Habitats and Species standard costs),—,UNVERIFIED,woodland restoration app
+PAWS natural regeneration factor,0.7,ratio,not verified,—,UNVERIFIED,woodland restoration app
+Timber prices (PAWS),25–35,GBP per tonne standing,assumptions; reference GB coniferous standing sales £34.28/m3 overbark (year to Sep 2025; Forest Research TPI),2025-11,ASSUMPTION + CITED reference,woodland restoration app
+PAWS sponsorship and biodiversity credit values,750 default (0–2500); 180/ha/yr,GBP per ha,indicative assumptions; statutory BNG is England-only,—,ASSUMPTION,woodland restoration app
+Carbon audit deadline,May 2028,date,Whole Farm Plan condition for Basic Payment claimants (FAS Agribusiness News Feb 2025),2025-02,CITED,resilience-dreel-burn
