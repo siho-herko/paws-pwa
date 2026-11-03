@@ -46,15 +46,34 @@ function _putRecord(db, data) {
   });
 }
 
-async function _seed(db) {
-  const response = await fetch(SEED_URL);
+async function _fetchSeed() {
+  // no-cache: revalidate with the server so a refreshed seed is seen promptly
+  const response = await fetch(SEED_URL, { cache: 'no-cache' });
   if (!response.ok) {
     throw new Error(`PAWS DB: failed to fetch seed file (${response.status})`);
   }
-  const constants = await response.json();
-  await _putRecord(db, constants);
+  return response.json();
+}
+
+async function _seed(db, constants) {
+  const seed = constants ?? await _fetchSeed();
+  await _putRecord(db, seed);
   console.info('PAWS DB seeded from paws_constants.json');
-  return constants;
+  return seed;
+}
+
+/**
+ * Compare dotted version strings ("1.0" < "2.0" < "2.1").
+ * Returns -1, 0 or 1. Missing parts count as 0.
+ */
+export function compareVersions(a, b) {
+  const pa = String(a ?? '0').split('.').map(n => parseInt(n, 10) || 0);
+  const pb = String(b ?? '0').split('.').map(n => parseInt(n, 10) || 0);
+  for (let i = 0; i < Math.max(pa.length, pb.length); i++) {
+    const d = (pa[i] ?? 0) - (pb[i] ?? 0);
+    if (d) return d > 0 ? 1 : -1;
+  }
+  return 0;
 }
 
 // ─────────────────────────────────────────────────
@@ -64,8 +83,17 @@ async function _seed(db) {
 let _db = null;
 
 /**
+ * Set when openDB() replaced stored constants because the seed file has a
+ * newer version. app.js reads it to show a one-time notice. Si's decision
+ * (3 Nov 2026): reset to the new rates, including any user overrides, and say so.
+ * @type {{from: string, to: string, lastUpdated: string|null} | null}
+ */
+export let reseedInfo = null;
+
+/**
  * openDB()
- * Opens (and seeds if empty) the IndexedDB.
+ * Opens the IndexedDB, seeds it if empty, and reseeds it when the seed file's
+ * `version` is newer than the stored record's. Offline, the stored record is kept.
  * Returns Promise<IDBDatabase>.
  * Subsequent calls return the cached connection.
  */
@@ -75,10 +103,28 @@ export async function openDB() {
   _db = await _openRaw();
   const existing = await _getRecord(_db);
 
-  if (existing) {
-    console.info('PAWS DB: loaded existing constants');
-  } else {
+  if (!existing) {
     await _seed(_db);
+    return _db;
+  }
+
+  let seed = null;
+  try {
+    seed = await _fetchSeed();
+  } catch (err) {
+    console.info('PAWS DB: seed not reachable, using stored constants', err);
+  }
+
+  if (seed && compareVersions(seed.version, existing.version) > 0) {
+    await _seed(_db, seed);
+    reseedInfo = {
+      from: String(existing.version ?? 'unknown'),
+      to: String(seed.version),
+      lastUpdated: seed.metadata?.last_updated ?? null,
+    };
+    console.info(`PAWS DB: constants updated ${reseedInfo.from} → ${reseedInfo.to}`);
+  } else {
+    console.info('PAWS DB: loaded existing constants');
   }
 
   return _db;

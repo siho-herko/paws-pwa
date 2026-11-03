@@ -10,7 +10,7 @@
  *   runCalculation() — patches constants, calculates, renders, encodes URL
  */
 
-import { dbReady, getConstants, resetConstants } from './db.js';
+import { dbReady, getConstants, resetConstants, reseedInfo } from './db.js';
 import {
   calculate,
   suggestPerimeter,
@@ -802,6 +802,29 @@ function registerServiceWorker() {
 }
 
 // ─────────────────────────────────────────────────
+// One-time notice when stored rates were replaced by a newer seed
+// ─────────────────────────────────────────────────
+
+function showRatesUpdatedNotice(info) {
+  const header = document.querySelector('.site-header');
+  if (!header || document.getElementById('rates-updated-notice')) return;
+  const box = document.createElement('div');
+  box.id = 'rates-updated-notice';
+  box.setAttribute('role', 'status');
+  box.style.cssText = 'margin:0.75rem auto;max-width:60rem;padding:0.75rem 1rem;border:1px solid currentColor;border-radius:6px;display:flex;gap:1rem;align-items:flex-start;justify-content:space-between;';
+  const msg = document.createElement('p');
+  msg.style.margin = '0';
+  const when = info.lastUpdated ? ` to ${info.lastUpdated}` : '';
+  msg.textContent = `Rates updated${when}. Any custom values you saved earlier in this browser have been reset to the new defaults.`;
+  const btn = document.createElement('button');
+  btn.type = 'button';
+  btn.textContent = 'Dismiss';
+  btn.addEventListener('click', () => box.remove());
+  box.append(msg, btn);
+  header.insertAdjacentElement('afterend', box);
+}
+
+// ─────────────────────────────────────────────────
 // Boot
 // ─────────────────────────────────────────────────
 
@@ -818,6 +841,7 @@ function init() {
 async function _initAsync() {
   await dbReady;
   _constants = await getConstants();
+  if (reseedInfo) showRatesUpdatedNotice(reseedInfo);
 
   // Restore state from URL if present
   const urlState = decodeURL();

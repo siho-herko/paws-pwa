@@ -3,7 +3,7 @@
  * Cache-first strategy for all static assets.
  */
 
-const CACHE_NAME  = 'paws-modeller-v1';
+const CACHE_NAME  = 'paws-modeller-v2';
 
 const PRECACHE_URLS = [
   '/',
@@ -43,11 +43,28 @@ self.addEventListener('activate', event => {
   );
 });
 
-// ── Fetch: cache-first, falling back to network ──
+// ── Fetch: network-first for /data/ (rates must refresh), cache-first otherwise ──
 
 self.addEventListener('fetch', event => {
   // Only handle GET requests
   if (event.request.method !== 'GET') return;
+
+  const url = new URL(event.request.url);
+
+  if (url.origin === self.location.origin && url.pathname.startsWith('/data/')) {
+    event.respondWith(
+      fetch(event.request)
+        .then(response => {
+          if (response.ok) {
+            const clone = response.clone();
+            caches.open(CACHE_NAME).then(cache => cache.put(event.request, clone));
+          }
+          return response;
+        })
+        .catch(() => caches.match(event.request, { ignoreSearch: true }))
+    );
+    return;
+  }
 
   event.respondWith(
     caches.match(event.request)
