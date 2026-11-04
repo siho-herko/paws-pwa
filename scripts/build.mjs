@@ -6,7 +6,7 @@ import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const output = path.join(root, 'dist');
+const output = path.join(root, 'public');
 const appFiles = [
   '_headers',
   'app.js',
