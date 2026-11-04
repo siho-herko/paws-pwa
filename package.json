@@ -1,6 +1,10 @@
 {
+  "name": "paws-business-case-modeller",
+  "private": true,
   "type": "module",
   "scripts": {
+    "build": "node scripts/build.mjs",
+    "test": "node tests/calc.test.js",
     "test:calc": "node tests/calc.test.js"
   }
 }
