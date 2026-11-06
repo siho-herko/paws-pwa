@@ -28,4 +28,7 @@ for (const entry of appFiles) {
   await cp(path.join(root, entry), path.join(output, entry), { recursive: true });
 }
 
-console.log(`Built ${appFiles.length} app entries in ${output}`);
+// A top-level 404 disables Pages' SPA fallback, so omitted source paths stay unavailable.
+await cp(path.join(root, 'index.html'), path.join(output, '404.html'));
+
+console.log(`Built ${appFiles.length} app entries and 404.html in ${output}`);
