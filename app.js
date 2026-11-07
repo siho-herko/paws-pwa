@@ -13,6 +13,7 @@
 import { dbReady, getConstants, resetConstants, reseedInfo } from './db.js?v=13';
 import {
   calculate,
+  clampRhododendronInfestedHa,
   suggestPerimeter,
   difficultyLabel,
   difficultyClass,
@@ -186,7 +187,7 @@ function decodeURL() {
     esg_per_ha:        clamp(pi('esg',   0),   0,   2500),
     hire_agent:        p.get('agent') === '1',
     include_grants:    p.get('grants') === '1',
-    rhododendron_infested_ha: clamp(pn('ri', 0), 0, 20),
+    rhododendron_infested_ha: clampRhododendronInfestedHa(pn('ri', 0), clamp(pn('ha', 4), 0.5, 20)),
     adv_yield:              pN('yield'),
     adv_fencing_grant:      pN('fg'),
     adv_restocking_grant:   pN('rg'),
@@ -217,6 +218,8 @@ function applyStateToDOM(s) {
   chk('input-agent',      s.hire_agent);
   chk('input-grants',     s.include_grants);
   set('input-rhodo-infested', s.rhododendron_infested_ha);
+  const rhodoInput = el('input-rhodo-infested');
+  if (rhodoInput) rhodoInput.max = String(s.hectares);
 
   const noFence = s.fencing_m === 0;
   chk('input-no-fence', noFence);
@@ -661,11 +664,39 @@ function initCollapsibles() {
 // Event wiring — all inputs update _state then recalc
 // ─────────────────────────────────────────────────
 
+function setRhodoInfestedError(show, siteHa) {
+  const err = el('rhodo-infested-error');
+  const input = el('input-rhodo-infested');
+  if (err) {
+    err.hidden = !show;
+    err.textContent = show
+      ? `Infested area cannot exceed the site area (${Number(siteHa).toFixed(1)} ha).`
+      : 'Infested area cannot exceed the site area.';
+  }
+  if (input) {
+    if (show) input.setCustomValidity(`Infested area cannot exceed the site area (${Number(siteHa).toFixed(1)} ha).`);
+    else input.setCustomValidity('');
+  }
+}
+
+/** Cap infested ha at site ha; update max attribute and optional validation message. */
+function syncRhodoInfestedToSite({ announce = false } = {}) {
+  const siteHa = _state.hectares;
+  const input = el('input-rhodo-infested');
+  if (input) input.max = String(siteHa);
+  const capped = clampRhododendronInfestedHa(_state.rhododendron_infested_ha, siteHa);
+  const wasOver = _state.rhododendron_infested_ha > siteHa;
+  _state.rhododendron_infested_ha = capped;
+  if (input && Number(input.value) !== capped) input.value = capped;
+  setRhodoInfestedError(announce && wasOver, siteHa);
+}
+
 function initInputEvents() {
   // Site size slider
   el('input-size')?.addEventListener('input', () => {
     _state.hectares = parseFloat(el('input-size').value) || 4;
     el('input-size-num').value = _state.hectares;
+    syncRhodoInfestedToSite({ announce: true });
     runCalculation();
   });
 
@@ -676,6 +707,7 @@ function initInputEvents() {
       _state.hectares = v;
       el('input-size').value = v;
       el('input-size-num').setCustomValidity('');
+      syncRhodoInfestedToSite({ announce: true });
       runCalculation();
     } else {
       el('input-size-num').setCustomValidity('Enter a value between 0.5 and 20 hectares');
@@ -736,11 +768,23 @@ function initInputEvents() {
     runCalculation();
   });
 
-  // Rhododendron infested area (ha) — grant = infested × method rate
+  // Rhododendron infested area (ha) — grant = infested × method rate; capped at site ha
   const dRhodo = debounce(runCalculation, 300);
   el('input-rhodo-infested')?.addEventListener('input', () => {
-    const v = parseFloat(el('input-rhodo-infested').value);
-    _state.rhododendron_infested_ha = isNaN(v) || v < 0 ? 0 : Math.min(v, 20);
+    const input = el('input-rhodo-infested');
+    const v = parseFloat(input.value);
+    const siteHa = _state.hectares;
+    if (isNaN(v) || v < 0) {
+      _state.rhododendron_infested_ha = 0;
+      setRhodoInfestedError(false, siteHa);
+    } else if (v > siteHa) {
+      _state.rhododendron_infested_ha = siteHa;
+      input.value = siteHa;
+      setRhodoInfestedError(true, siteHa);
+    } else {
+      _state.rhododendron_infested_ha = v;
+      setRhodoInfestedError(false, siteHa);
+    }
     dRhodo();
   });
 

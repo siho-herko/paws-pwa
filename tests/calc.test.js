@@ -2,7 +2,8 @@
 import {
   calculate, timberRevenue, fgsGrants, esgIncome, grossInflow,
   contractorCosts, diyCosts, agentFee, grossOutflow, netCashYear1,
-  sweatEquitySaving, fundingMix, longTermProjection, breakevenStatus
+  sweatEquitySaving, fundingMix, longTermProjection, breakevenStatus,
+  clampRhododendronInfestedHa
 } from '../calc.js';
 import { readFileSync } from 'fs';
 
@@ -252,6 +253,13 @@ assert(!!live.metadata?.sources && !!live.metadata?.last_updated && !!live.metad
     rhododendron_infested_ha: 0, override_rhododendron_grant: 3500,
   }, live);
   assert(rh0.fgs_breakdown.rhododendron_grant === 0, 'live: 0 infested ha → £0 rhodo even with rate', 0, rh0.fgs_breakdown.rhododendron_grant);
+  assert(clampRhododendronInfestedHa(5, 4) === 4, 'infested ha capped at site ha (5→4)', 4, clampRhododendronInfestedHa(5, 4));
+  assert(clampRhododendronInfestedHa(2, 4) === 2, 'infested ha under site unchanged', 2, clampRhododendronInfestedHa(2, 4));
+  const rhOver = calculate({
+    ...base, include_conditional_grants: true,
+    rhododendron_infested_ha: 10, override_rhododendron_grant: 1000,
+  }, live);
+  assert(near(rhOver.fgs_breakdown.rhododendron_grant, 4000), 'live: over-site infested capped (4 ha × £1000)', 4000, rhOver.fgs_breakdown.rhododendron_grant);
   assert(live.costs.note_fencing.includes('~79%'), 'fence note ~79% of contractor rate', '~79%', live.costs.note_fencing);
   assert(live.metadata.last_updated === '7 November 2026', 'constants last_updated 7 Nov 2026', '7 November 2026', live.metadata.last_updated);
   const yr15 = def.projection[14];

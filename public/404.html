@@ -269,14 +269,17 @@
               <input
                 type="number"
                 id="input-rhodo-infested"
-                min="0" max="20" step="0.1"
+                min="0" max="4" step="0.1"
                 value="0"
                 aria-label="Rhododendron infested area in hectares"
               >
               <span class="text-muted" style="font-size:0.8rem;">ha</span>
             </div>
-            <p class="helper-text mt-8">
-              Grant = infested hectares × method rate (not the whole site). Default 0 ha keeps the rhododendron grant at £0. Enter a method rate under Advanced Settings.
+            <p class="helper-text mt-8" id="rhodo-infested-helper">
+              Rhododendron grants are paid per hectare of infested land. Enter the infested area and the rate for your control method.
+            </p>
+            <p class="helper-text mt-8" id="rhodo-infested-error" role="alert" hidden>
+              Infested area cannot exceed the site area.
             </p>
 
             <div class="slider-row">
@@ -369,7 +372,7 @@
                   <input type="number" class="adv-override" id="adv-rhododendron-grant"
                          placeholder="0" min="0" max="10000" step="100">
                   <p class="helper-text mt-8">
-                    Habitats and Species method rates (£200–£7,300/ha of infested land). Grant = infested area × this rate.
+                    Rhododendron grants are paid per hectare of infested land. Enter the infested area and the rate for your control method.
                   </p>
                 </div>
 
