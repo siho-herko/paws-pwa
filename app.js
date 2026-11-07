@@ -10,7 +10,7 @@
  *   runCalculation() — patches constants, calculates, renders, encodes URL
  */
 
-import { dbReady, getConstants, resetConstants, reseedInfo } from './db.js';
+import { dbReady, getConstants, resetConstants, reseedInfo } from './db.js?v=10';
 import {
   calculate,
   suggestPerimeter,
@@ -18,8 +18,8 @@ import {
   difficultyClass,
   speciesLabel,
   speciesIcon,
-} from './calc.js';
-import { donutChart, lineChart, CHART_COLORS } from './charts.js';
+} from './calc.js?v=10';
+import { donutChart, lineChart, CHART_COLORS } from './charts.js?v=10';
 
 // ─────────────────────────────────────────────────
 // Application state — single source of truth
@@ -807,7 +807,7 @@ function hideOverlay() {
 
 function registerServiceWorker() {
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/sw.js').catch(() => {});
+    navigator.serviceWorker.register('/sw.js?v=10').catch(() => {});
   }
 }
 
