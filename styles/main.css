@@ -12,10 +12,11 @@
   --c-leaf:     #52b788;
   --c-gold:     #b5830a;
   --c-gold-lt:  #f4c542;
+  --c-gold-text: #7a5806;
   --c-cream:    #faf7f0;
   --c-stone:    #e8e4dc;
   --c-ink:      #1c1c1c;
-  --c-muted:    #6b7280;
+  --c-muted:    #5b6270;
   --c-positive: #166534;
   --c-negative: #9b2226;
   --c-warn:     #92400e;
@@ -121,7 +122,7 @@ h1, h2, h3, h4 {
   font-size: 0.8rem;
   font-weight: 600;
   line-height: 1.4;
-  color: var(--c-leaf);
+  color: #e8f5ee;
 }
 
 /* ── App Layout ── */
@@ -212,7 +213,7 @@ h1, h2, h3, h4 {
 .section-number {
   font-family: 'JetBrains Mono', monospace;
   font-size: 0.72rem;
-  color: var(--c-gold);
+  color: var(--c-gold-text);
   font-weight: 600;
   margin-right: 8px;
 }
@@ -249,7 +250,7 @@ h1, h2, h3, h4 {
   font-family: 'JetBrains Mono', monospace;
   font-size: 0.85rem;
   font-weight: 600;
-  color: var(--c-gold);
+  color: var(--c-gold-text);
   background: rgba(181,131,10,.08);
   padding: 2px 8px;
   border-radius: var(--radius-sm);
@@ -423,7 +424,7 @@ select:focus { border-color: var(--c-mid); }
 
 .stat-chip.planting {
   background: rgba(181,131,10,.1);
-  color: var(--c-gold);
+  color: var(--c-gold-text);
   border-color: var(--c-gold);
 }
 
@@ -587,6 +588,7 @@ select:focus { border-color: var(--c-mid); }
   color: var(--c-muted);
   font-size: 0.85rem;
 }
+.results-header a { color: var(--c-mid); }
 
 /* ── Result Hero ── */
 .result-hero {
@@ -843,7 +845,7 @@ select:focus { border-color: var(--c-mid); }
 .text-negative { color: var(--c-negative); }
 .text-warn     { color: var(--c-warn); }
 .text-muted    { color: var(--c-muted); }
-.text-gold     { color: var(--c-gold); }
+.text-gold     { color: var(--c-gold-text); }
 
 .mt-4  { margin-top: 4px; }
 .mt-8  { margin-top: 8px; }
@@ -1057,14 +1059,14 @@ select:focus { border-color: var(--c-mid); }
 .sweat-total-label {
   font-size: 0.85rem;
   font-weight: 700;
-  color: var(--c-gold);
+  color: var(--c-gold-text);
 }
 
 .sweat-total-value {
   font-family: 'JetBrains Mono', monospace;
   font-size: 1.35rem;
   font-weight: 700;
-  color: var(--c-gold);
+  color: var(--c-gold-text);
 }
 
 .sweat-flip-msg {
@@ -1216,7 +1218,7 @@ select:focus { border-color: var(--c-mid); }
   background: transparent;
   border: 1.5px solid var(--c-gold);
   border-radius: var(--radius-sm);
-  color: var(--c-gold);
+  color: var(--c-gold-text);
   font-family: 'Source Sans 3', sans-serif;
   font-size: 0.82rem;
   font-weight: 600;
