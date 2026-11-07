@@ -1,9 +1,9 @@
 /**
- * sw.js — PAWS Business Case Modeller Service Worker
+ * sw.js — Woodland Restoration Calculator service worker
  * Cache-first strategy for all static assets.
  */
 
-const CACHE_NAME  = 'paws-modeller-v4';
+const CACHE_NAME  = 'paws-modeller-v5';
 
 const PRECACHE_URLS = [
   '/',

@@ -1,6 +1,6 @@
 {
-  "name": "PAWS Business Case Modeller",
-  "short_name": "PAWS Modeller",
+  "name": "Woodland Restoration Calculator",
+  "short_name": "Woodland Restoration",
   "description": "Model the financial case for ancient woodland restoration in Fife.",
   "start_url": "/",
   "display": "standalone",
