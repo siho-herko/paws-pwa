@@ -3,7 +3,7 @@
  * Cache-first strategy for all static assets.
  */
 
-const CACHE_NAME  = 'paws-modeller-v3';
+const CACHE_NAME  = 'paws-modeller-v4';
 
 const PRECACHE_URLS = [
   '/',

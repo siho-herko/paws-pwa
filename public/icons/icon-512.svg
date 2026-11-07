@@ -15,10 +15,7 @@
 
   <!-- Gold badge -->
   <circle cx="400" cy="404" r="64" fill="#b5830a"/>
-  <text x="400" y="396" text-anchor="middle"
+  <text x="400" y="414" text-anchor="middle"
         font-family="Georgia, serif" font-size="28" font-weight="700"
         fill="#faf7f0">PAWS</text>
-  <text x="400" y="424" text-anchor="middle"
-        font-family="Georgia, serif" font-size="18" font-weight="400"
-        fill="#f4c542">NFCA</text>
 </svg>

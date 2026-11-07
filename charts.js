@@ -3,12 +3,12 @@
  * Uses HTML5 Canvas 2D API only — no external libraries.
  *
  * Chart colour palette (per Prompt 4 spec):
- *   Timber revenue  #2d6a4f  (NFCA mid green)
- *   FGS grants      #52b788  (NFCA leaf green)
- *   ESG income      #f4c542  (NFCA gold light)
+ *   Timber revenue  #2d6a4f  (mid green)
+ *   FGS grants      #52b788  (leaf green)
+ *   ESG income      #f4c542  (gold light)
  *   Contractor cost #9b2226  (negative red)
  *   DIY cost        #ef4444  (lighter red)
- *   Sweat saving    #b5830a  (NFCA gold)
+ *   Sweat saving    #b5830a  (gold)
  *   Net positive    #166534
  *   Net negative    #9b2226
  */
