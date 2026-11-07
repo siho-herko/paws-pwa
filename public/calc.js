@@ -1,5 +1,5 @@
 /**
- * calc.js — PAWS Business Case Modeller
+ * calc.js — Woodland Restoration Calculator
  * Pure calculation engine. No DOM access.
  * All functions are exported ES module exports.
  */

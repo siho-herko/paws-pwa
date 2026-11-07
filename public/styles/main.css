@@ -1,5 +1,5 @@
 /* ============================================================
-   PAWS Business Case Modeller — Design System
+   Woodland Restoration Calculator — Design System
    ============================================================ */
 
 /* ── Google Fonts ── */
@@ -66,8 +66,8 @@ h1, h2, h3, h4 {
 .header-main {
   max-width: 1160px;
   margin: 0 auto;
-  padding: 0 20px;
-  height: 60px;
+  padding: 8px 20px;
+  min-height: 60px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -113,14 +113,14 @@ h1, h2, h3, h4 {
 .header-back:hover { color: #fff; }
 
 .header-subtitle {
+  margin: 0;
   background: var(--c-mid);
   text-align: center;
-  padding: 5px 20px;
-  font-size: 0.72rem;
+  padding: 6px 20px;
+  font-size: 0.8rem;
   font-weight: 600;
+  line-height: 1.4;
   color: var(--c-leaf);
-  letter-spacing: .08em;
-  text-transform: uppercase;
 }
 
 /* ── App Layout ── */

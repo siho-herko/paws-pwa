@@ -1,5 +1,5 @@
 /**
- * charts.js — Zero-dependency canvas charts for PAWS modeller
+ * charts.js — Zero-dependency canvas charts for the Woodland Restoration Calculator
  * Uses HTML5 Canvas 2D API only — no external libraries.
  *
  * Chart colour palette (per Prompt 4 spec):

@@ -1,5 +1,5 @@
 /**
- * app.js — PAWS Business Case Modeller
+ * app.js — Woodland Restoration Calculator
  * Main application controller
  *
  * Architecture:
