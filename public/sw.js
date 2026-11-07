@@ -3,7 +3,7 @@
  * Cache-first strategy for all static assets.
  */
 
-const CACHE_NAME  = 'paws-modeller-v6';
+const CACHE_NAME  = 'paws-modeller-v7';
 
 const PRECACHE_URLS = [
   '/',
@@ -12,7 +12,7 @@ const PRECACHE_URLS = [
   '/calc.js',
   '/charts.js',
   '/db.js',
-  '/styles/main.css',
+  '/styles/main.css?v=7',
   '/data/paws_constants.json',
   '/manifest.json',
   '/icons/icon-192.svg',

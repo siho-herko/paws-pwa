@@ -7,3 +7,31 @@
 
 /data/*
   Cache-Control: public, max-age=0, must-revalidate
+
+/sw.js
+  ! Cache-Control
+  Cache-Control: no-cache
+
+/app.js
+  ! Cache-Control
+  Cache-Control: no-cache
+
+/calc.js
+  ! Cache-Control
+  Cache-Control: no-cache
+
+/charts.js
+  ! Cache-Control
+  Cache-Control: no-cache
+
+/db.js
+  ! Cache-Control
+  Cache-Control: no-cache
+
+/styles/*
+  ! Cache-Control
+  Cache-Control: no-cache
+
+/manifest.json
+  ! Cache-Control
+  Cache-Control: no-cache
