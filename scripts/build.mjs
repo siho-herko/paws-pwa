@@ -15,6 +15,7 @@ const appFiles = [
   'data',
   'db.js',
   'icons',
+  'images',
   'index.html',
   'manifest.json',
   'styles',

@@ -1332,6 +1332,61 @@ select:focus { border-color: var(--c-mid); }
 }
 .footer-link:hover { opacity: .8; }
 
+.footer-details {
+  max-width: 52rem;
+  margin: 20px auto 8px;
+  text-align: center;
+  line-height: 1.6;
+  color: rgba(255,255,255,.85);
+}
+.footer-details p { margin: 0 0 12px; }
+.footer-details a { color: var(--c-leaf); }
+.footer-details a:hover { color: var(--c-gold-lt, #f4c542); }
+.footer-funders { margin: 20px 0; }
+
+/* Light panel so the black funder logos stay visible on the dark footer;
+   32 px padding is the Heritage Fund stamp's minimum clear space */
+.footer-logo-panel {
+  background: #F4EFE3;
+  border-radius: var(--radius-md);
+  padding: 32px;
+  margin-top: 16px;
+  display: flex;
+  justify-content: center;
+}
+.footer-logos {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 32px;
+}
+/* Never recolour, invert, crop or stretch funder marks */
+.footer-logo {
+  display: block;
+  filter: none;
+  mix-blend-mode: normal;
+}
+.footer-logo--heritage {
+  width: 240px;
+  height: 240px;
+  flex-shrink: 0;
+}
+.footer-logo--lockup {
+  width: min(401px, 100%);
+  height: auto;
+}
+@media (min-width: 768px) {
+  .footer-logos {
+    flex-direction: row;
+    gap: 48px;
+  }
+}
+/* 240 px stamp + 2 × 32 px clear space needs 304 px */
+@media (max-width: 359px) {
+  .footer-logo-panel { margin-inline: -16px; }
+}
+.footer-credit { font-weight: 600; }
+
 @media print {
   .site-footer { display: none !important; }
 }
