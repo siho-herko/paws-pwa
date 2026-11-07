@@ -2,7 +2,8 @@
 import {
   calculate, timberRevenue, fgsGrants, esgIncome, grossInflow,
   contractorCosts, diyCosts, agentFee, grossOutflow, netCashYear1,
-  sweatEquitySaving, fundingMix, longTermProjection, breakevenStatus
+  sweatEquitySaving, fundingMix, longTermProjection, breakevenStatus,
+  clampRhododendronInfestedHa
 } from '../calc.js';
 import { readFileSync } from 'fs';
 
@@ -29,7 +30,8 @@ function pct(a, b, tol = 0.5)  { return Math.abs(a - b) <= tol; }
 console.log('\n=== TC1: Default 4ha Sitka, diff=1, 400m fence, 40% regen ===');
 const tc1 = { include_conditional_grants:true, hectares:4, species:'sitka_spruce', difficulty:1, fencing_m:400,
                natural_regen_pct:40, esg_per_ha:750, hire_agent:false,
-               override_yield:null, override_fencing_grant:null, override_restocking_grant:null };
+               override_yield:null, override_fencing_grant:null, override_restocking_grant:null,
+               rhododendron_infested_ha:4 };
 const r1 = calculate(tc1, constants);
 
 assert(near(r1.timber_revenue, 35000),                    'TC1 timber_revenue',              35000,    r1.timber_revenue);
@@ -58,7 +60,8 @@ assert(r1.breakeven_status === 'POSITIVE',                'TC1 breakeven POSITIV
 console.log('\n=== TC2: Difficulty 5 Sitka — timber negative, grants rescue ===');
 const tc2 = { include_conditional_grants:true, hectares:4, species:'sitka_spruce', difficulty:5, fencing_m:400,
                natural_regen_pct:40, esg_per_ha:750, hire_agent:false,
-               override_yield:null, override_fencing_grant:null, override_restocking_grant:null };
+               override_yield:null, override_fencing_grant:null, override_restocking_grant:null,
+               rhododendron_infested_ha:4 };
 const r2 = calculate(tc2, constants);
 
 assert(near(r2.timber_revenue, -7000),           'TC2 timber_revenue negative',                              -7000,  r2.timber_revenue);
@@ -72,7 +75,8 @@ assert(r2.breakeven_status === 'GRANTS_NEEDED',  'TC2 breakeven GRANTS_NEEDED', 
 console.log('\n=== TC3: Larch diff=1 — peak timber value ===');
 const tc3 = { include_conditional_grants:true, hectares:4, species:'larch', difficulty:1, fencing_m:400,
                natural_regen_pct:40, esg_per_ha:750, hire_agent:false,
-               override_yield:null, override_fencing_grant:null, override_restocking_grant:null };
+               override_yield:null, override_fencing_grant:null, override_restocking_grant:null,
+               rhododendron_infested_ha:4 };
 const r3 = calculate(tc3, constants);
 
 assert(near(r3.timber_revenue, 49000),          'TC3 timber_revenue Larch',     49000,  r3.timber_revenue);
@@ -86,7 +90,8 @@ assert(r3.net_year1_contractor > r1.net_year1_contractor, 'TC3 Larch > Sitka net
 console.log('\n=== TC4: Zero fencing ===');
 const tc4 = { include_conditional_grants:true, hectares:4, species:'sitka_spruce', difficulty:2, fencing_m:0,
                natural_regen_pct:40, esg_per_ha:0, hire_agent:false,
-               override_yield:null, override_fencing_grant:null, override_restocking_grant:null };
+               override_yield:null, override_fencing_grant:null, override_restocking_grant:null,
+               rhododendron_infested_ha:4 };
 const r4 = calculate(tc4, constants);
 
 assert(r4.fgs_breakdown.fencing_grant === 0,    'TC4 fencing_grant is zero',        0,      r4.fgs_breakdown.fencing_grant);
@@ -100,7 +105,8 @@ assert(near(r4.net_year1_contractor, 41008),    'TC4 net_year1_contractor no fen
 console.log('\n=== TC5: 100% natural regen — zero planting ===');
 const tc5 = { include_conditional_grants:true, hectares:4, species:'sitka_spruce', difficulty:2, fencing_m:400,
                natural_regen_pct:100, esg_per_ha:0, hire_agent:false,
-               override_yield:null, override_fencing_grant:null, override_restocking_grant:null };
+               override_yield:null, override_fencing_grant:null, override_restocking_grant:null,
+               rhododendron_infested_ha:4 };
 const r5 = calculate(tc5, constants);
 
 assert(r5.fgs_breakdown.tree_protection_grant === 0, 'TC5 tree_protection_grant zero', 0,    r5.fgs_breakdown.tree_protection_grant);
@@ -115,7 +121,8 @@ assert(near(r5.net_year1_contractor, 39880),         'TC5 net_year1_contractor',
 console.log('\n=== TC6: Agent hired — fee reduces net ===');
 const tc6 = { include_conditional_grants:true, hectares:4, species:'sitka_spruce', difficulty:2, fencing_m:400,
                natural_regen_pct:40, esg_per_ha:750, hire_agent:true,
-               override_yield:null, override_fencing_grant:null, override_restocking_grant:null };
+               override_yield:null, override_fencing_grant:null, override_restocking_grant:null,
+               rhododendron_infested_ha:4 };
 const r6 = calculate(tc6, constants);
 
 assert(near(r6.gross_inflow, 59968),                    'TC6 gross_inflow diff=2',              59968,      r6.gross_inflow);
@@ -128,7 +135,8 @@ assert(r6.net_year1_contractor < r1.net_year1_contractor, 'TC6 agent reduces net
 console.log('\n=== TC7: Minimum site 0.5ha ===');
 const tc7 = { include_conditional_grants:true, hectares:0.5, species:'scots_pine', difficulty:3, fencing_m:100,
                natural_regen_pct:50, esg_per_ha:500, hire_agent:false,
-               override_yield:null, override_fencing_grant:null, override_restocking_grant:null };
+               override_yield:null, override_fencing_grant:null, override_restocking_grant:null,
+               rhododendron_infested_ha:0.5 };
 const r7 = calculate(tc7, constants);
 
 assert(near(r7.timber_revenue, 4375),           'TC7 timber_revenue 0.5ha',             4375,   r7.timber_revenue);
@@ -142,7 +150,8 @@ assert(isFinite(r7.net_year1_contractor),       'TC7 no Infinity at boundary',  
 console.log('\n=== TC8: Maximum site 20ha ===');
 const tc8 = { include_conditional_grants:true, hectares:20, species:'mixed_conifer', difficulty:2, fencing_m:1800,
                natural_regen_pct:20, esg_per_ha:1000, hire_agent:false,
-               override_yield:null, override_fencing_grant:null, override_restocking_grant:null };
+               override_yield:null, override_fencing_grant:null, override_restocking_grant:null,
+               rhododendron_infested_ha:20 };
 const r8 = calculate(tc8, constants);
 
 assert(near(r8.timber_revenue, 175000),         'TC8 timber_revenue 20ha',              175000, r8.timber_revenue);
@@ -233,6 +242,26 @@ assert(!!live.metadata?.sources && !!live.metadata?.last_updated && !!live.metad
   assert(near(g.fgs_total, 5120), 'live grants on: total £5,120', 5120, g.fgs_total);
   const t300 = calculate({ ...base, include_conditional_grants: true, override_restocking_grant: 300 }, live);
   assert(near(t300.fgs_breakdown.restocking_grant, 720), 'live: £300 tier → £720 on 4 ha', 720, t300.fgs_breakdown.restocking_grant);
+  // Infested-area rhododendron: 1.5 ha × £3,500 = £5,250 (not whole-site 4 ha)
+  const rh = calculate({
+    ...base, include_conditional_grants: true,
+    rhododendron_infested_ha: 1.5, override_rhododendron_grant: 3500,
+  }, live);
+  assert(near(rh.fgs_breakdown.rhododendron_grant, 5250), 'live: rhodo = infested_ha × rate (1.5 × 3500)', 5250, rh.fgs_breakdown.rhododendron_grant);
+  const rh0 = calculate({
+    ...base, include_conditional_grants: true,
+    rhododendron_infested_ha: 0, override_rhododendron_grant: 3500,
+  }, live);
+  assert(rh0.fgs_breakdown.rhododendron_grant === 0, 'live: 0 infested ha → £0 rhodo even with rate', 0, rh0.fgs_breakdown.rhododendron_grant);
+  assert(clampRhododendronInfestedHa(5, 4) === 4, 'infested ha capped at site ha (5→4)', 4, clampRhododendronInfestedHa(5, 4));
+  assert(clampRhododendronInfestedHa(2, 4) === 2, 'infested ha under site unchanged', 2, clampRhododendronInfestedHa(2, 4));
+  const rhOver = calculate({
+    ...base, include_conditional_grants: true,
+    rhododendron_infested_ha: 10, override_rhododendron_grant: 1000,
+  }, live);
+  assert(near(rhOver.fgs_breakdown.rhododendron_grant, 4000), 'live: over-site infested capped (4 ha × £1000)', 4000, rhOver.fgs_breakdown.rhododendron_grant);
+  assert(live.costs.note_fencing.includes('~79%'), 'fence note ~79% of contractor rate', '~79%', live.costs.note_fencing);
+  assert(live.metadata.last_updated === '7 November 2026', 'constants last_updated 7 Nov 2026', '7 November 2026', live.metadata.last_updated);
   const yr15 = def.projection[14];
   assert(yr15.natural_capital === 0, 'live: projection has no audit income', 0, yr15.natural_capital);
 }

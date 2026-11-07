@@ -36,6 +36,18 @@ export function timberRevenue(inputs, constants) {
 // ─────────────────────────────────────────────────
 
 /**
+ * Cap rhododendron infested area so it cannot exceed the site area.
+ * @param {number} infestedHa
+ * @param {number} siteHa
+ * @returns {number}
+ */
+export function clampRhododendronInfestedHa(infestedHa, siteHa) {
+  const site = Math.max(0, Number(siteHa) || 0);
+  const inf  = Math.max(0, Number(infestedHa) || 0);
+  return Math.min(inf, site);
+}
+
+/**
  * FGS grant breakdown. All grants are CONDITIONAL: they are counted only when
  * inputs.include_conditional_grants is true (the app defaults it to false).
  *
@@ -43,8 +55,8 @@ export function timberRevenue(inputs, constants) {
  *   • Active-planting portion  → tier rate × active_fraction
  *   • Natural-regen portion    → natural_regen_grant_per_ha × regen_fraction
  *     (v2.1 default £0; legacy constants used rate × natural_regen_discount)
- * Rhododendron clearance: rate per ha × site ha (v2.1 default £0; real rates are
- * per ha of infested land by method — enter a site-specific rate).
+ * Rhododendron clearance: rate per ha of infested land × infested ha
+ * (v2.1 default rate £0 and default infested ha 0; infested ha capped at site ha).
  *
  * @returns {{ fencing_grant, tree_protection_grant, restocking_grant,
  *             rhododendron_grant, total_fgs }}
@@ -52,7 +64,7 @@ export function timberRevenue(inputs, constants) {
 export function fgsGrants(inputs, constants) {
   const { hectares, fencing_m, natural_regen_pct,
           override_fencing_grant, override_restocking_grant,
-          override_rhododendron_grant } = inputs;
+          override_rhododendron_grant, rhododendron_infested_ha } = inputs;
   const g = constants.fgs_grants;
   const c = constants.costs;
 
@@ -80,9 +92,10 @@ export function fgsGrants(inputs, constants) {
   const regenPart       = hectares * regenFraction  * regenRate;
   const restocking_grant = activePart + regenPart;
 
-  // Rhododendron / invasive clearance — whole site × rate until infested-area input lands
+  // Rhododendron / invasive clearance — infested ha × method rate (not whole site)
+  const infestedHa = clampRhododendronInfestedHa(rhododendron_infested_ha, hectares);
   const rhodoRate = override_rhododendron_grant ?? g.rhododendron_clearance_per_ha;
-  const rhododendron_grant = hectares * rhodoRate;
+  const rhododendron_grant = infestedHa * rhodoRate;
 
   const total_fgs = fencing_grant + tree_protection_grant
                   + restocking_grant + rhododendron_grant;

@@ -24,7 +24,7 @@
   <link rel="icon" href="icons/icon-192.svg" type="image/svg+xml">
 
   <!-- Styles -->
-  <link rel="stylesheet" href="styles/main.css?v=12">
+  <link rel="stylesheet" href="styles/main.css?v=13">
 </head>
 <body>
 
@@ -33,7 +33,7 @@
     <div class="loading-inner">
       <div class="loading-icon">🌲</div>
       <h2>Loading PAWS data…</h2>
-      <p>Forestry Grant Scheme rates (checked 3 November 2026)</p>
+      <p>Forestry Grant Scheme rates (checked 7 November 2026)</p>
     </div>
   </div>
 
@@ -261,7 +261,25 @@
               <span class="toggle-label">Include conditional grants</span>
             </div>
             <p class="helper-text mt-8">
-              Grants are not confirmed. Restructuring Regeneration pays £300 or £550/ha only with an approved Felling Permission or forest plan and the required species mix. Deer fencing is claimable only through Woodland Creation or Habitats and Species, where Scottish Forestry agrees deer would otherwise prevent the objectives. Rhododendron rates depend on method and infested area. Check with Scottish Forestry before relying on any grant.
+              Grants are not confirmed. Restructuring Regeneration pays £300 or £550/ha only with an approved Felling Permission or forest plan and the required species mix. Deer fencing is claimable only through Woodland Creation or Habitats and Species, where Scottish Forestry agrees deer would otherwise prevent the objectives. Rhododendron grants are paid per hectare of infested land. Check with Scottish Forestry before relying on any grant.
+            </p>
+
+            <div class="number-input-row mt-8">
+              <label for="input-rhodo-infested">Rhododendron infested area</label>
+              <input
+                type="number"
+                id="input-rhodo-infested"
+                min="0" max="4" step="0.1"
+                value="0"
+                aria-label="Rhododendron infested area in hectares"
+              >
+              <span class="text-muted" style="font-size:0.8rem;">ha</span>
+            </div>
+            <p class="helper-text mt-8" id="rhodo-infested-helper">
+              Rhododendron grants are paid per hectare of infested land. Enter the infested area and the rate for your control method.
+            </p>
+            <p class="helper-text mt-8" id="rhodo-infested-error" role="alert" hidden>
+              Infested area cannot exceed the site area.
             </p>
 
             <div class="slider-row">
@@ -350,11 +368,11 @@
                          placeholder="550" min="0" max="6000" step="100">
                 </div>
                 <div class="advanced-field">
-                  <label for="adv-rhododendron-grant">Rhododendron clearance (£/ha)</label>
+                  <label for="adv-rhododendron-grant">Rhododendron clearance (£/ha of infested land)</label>
                   <input type="number" class="adv-override" id="adv-rhododendron-grant"
                          placeholder="0" min="0" max="10000" step="100">
                   <p class="helper-text mt-8">
-                    Rhododendron grants are paid per hectare of infested land; until the calculator asks for infested area, enter a rate scaled to the infested share of the site.
+                    Rhododendron grants are paid per hectare of infested land. Enter the infested area and the rate for your control method.
                   </p>
                 </div>
 
@@ -554,7 +572,7 @@
           <li>
             <strong>Deer fencing and rhododendron control:</strong> Rural Payments and Services,
             <a href="https://www.ruralpayments.org/topics/all-schemes/forestry-grant-scheme/woodland-improvement-grant/habitats-and-species/" target="_blank" rel="noopener">Woodland Improvement Grant – Habitats and Species</a>
-            (date published 5 July 2019; rates as read on 7 November 2026). Deer fence £9.50/m. Rhododendron eradication is paid per hectare of infested land, by method: manual £3,500, £5,500 or £7,300; mechanised £2,200, £3,400 or £5,600; stem injection £3,000 or £4,500; foliar spray £200; follow-up £200. The calculator uses £0/ha for rhododendron unless you enter a site rate. Gate – for Deer Fence £215/each is claimable but not modelled here; Gate – for Stock Fence £170/each may also be claimable (same page, rates as read on 7 November 2026).
+            (date published 5 July 2019; rates as read on 7 November 2026). Deer fence £9.50/m. Rhododendron eradication is paid per hectare of infested land, by method: manual £3,500, £5,500 or £7,300; mechanised £2,200, £3,400 or £5,600; stem injection £3,000 or £4,500; foliar spray £200; follow-up £200. The calculator multiplies infested hectares by the method rate (defaults: 0 ha and £0/ha). Gate – for Deer Fence £215/each is claimable but not modelled here; Gate – for Stock Fence £170/each may also be claimable (same page, rates as read on 7 November 2026).
           </li>
           <li>
             <strong>Deer fence eligibility:</strong> Rural Payments and Services,
@@ -648,7 +666,7 @@
        SCRIPTS
   ═══════════════════════════════════════════ -->
   <!-- ES modules — order handled by import statements in app.js -->
-  <script type="module" src="app.js?v=12"></script>
+  <script type="module" src="app.js?v=13"></script>
 
 </body>
 </html>

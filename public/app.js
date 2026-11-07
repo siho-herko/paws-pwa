@@ -10,16 +10,17 @@
  *   runCalculation() — patches constants, calculates, renders, encodes URL
  */
 
-import { dbReady, getConstants, resetConstants, reseedInfo } from './db.js?v=12';
+import { dbReady, getConstants, resetConstants, reseedInfo } from './db.js?v=13';
 import {
   calculate,
+  clampRhododendronInfestedHa,
   suggestPerimeter,
   difficultyLabel,
   difficultyClass,
   speciesLabel,
   speciesIcon,
-} from './calc.js?v=12';
-import { donutChart, lineChart, CHART_COLORS } from './charts.js?v=12';
+} from './calc.js?v=13';
+import { donutChart, lineChart, CHART_COLORS } from './charts.js?v=13';
 
 // ─────────────────────────────────────────────────
 // Application state — single source of truth
@@ -35,6 +36,7 @@ const _state = {
   esg_per_ha:        0,      // optional scenario; no sponsor assumed
   hire_agent:        false,
   include_grants:    false,  // FGS grants are conditional — excluded by default
+  rhododendron_infested_ha: 0, // grant = infested ha × method rate; 0 keeps grant at £0
 
   // Advanced overrides (null = use base constant)
   adv_yield:              null,  // → inputs.override_yield
@@ -122,6 +124,7 @@ function buildInputs(state) {
     esg_per_ha:        state.esg_per_ha,
     hire_agent:        state.hire_agent,
     include_conditional_grants: state.include_grants,
+    rhododendron_infested_ha: state.rhododendron_infested_ha,
     override_yield:             state.adv_yield,
     override_fencing_grant:     state.adv_fencing_grant,
     override_restocking_grant:  state.adv_restocking_grant,
@@ -143,6 +146,7 @@ function encodeURL(state) {
   p.set('esg',   state.esg_per_ha);
   p.set('agent', state.hire_agent ? '1' : '0');
   p.set('grants', state.include_grants ? '1' : '0');
+  if (state.rhododendron_infested_ha) p.set('ri', state.rhododendron_infested_ha);
 
   // Only encode non-null overrides
   const enc = (key, val) => { if (val != null) p.set(key, val); };
@@ -183,6 +187,7 @@ function decodeURL() {
     esg_per_ha:        clamp(pi('esg',   0),   0,   2500),
     hire_agent:        p.get('agent') === '1',
     include_grants:    p.get('grants') === '1',
+    rhododendron_infested_ha: clampRhododendronInfestedHa(pn('ri', 0), clamp(pn('ha', 4), 0.5, 20)),
     adv_yield:              pN('yield'),
     adv_fencing_grant:      pN('fg'),
     adv_restocking_grant:   pN('rg'),
@@ -212,6 +217,9 @@ function applyStateToDOM(s) {
   set('input-esg',        s.esg_per_ha);
   chk('input-agent',      s.hire_agent);
   chk('input-grants',     s.include_grants);
+  set('input-rhodo-infested', s.rhododendron_infested_ha);
+  const rhodoInput = el('input-rhodo-infested');
+  if (rhodoInput) rhodoInput.max = String(s.hectares);
 
   const noFence = s.fencing_m === 0;
   chk('input-no-fence', noFence);
@@ -389,7 +397,7 @@ function renderBreakdown(r) {
         ${sub('Deer fencing (Habitats and Species route)', r.fgs_breakdown.fencing_grant)}
         ${sub('Tree protection (no item confirmed)',       r.fgs_breakdown.tree_protection_grant)}
         ${sub('Restructuring Regeneration',                r.fgs_breakdown.restocking_grant)}
-        ${sub('Rhododendron control (site rate needed)',   r.fgs_breakdown.rhododendron_grant)}
+        ${sub('Rhododendron control (infested ha × rate)',  r.fgs_breakdown.rhododendron_grant)}
         ${row('Private sponsorship (optional scenario)', r.esg_income, 'var(--c-positive)')}
         <tr class="subtotal-row">
           <td>Gross inflow</td>
@@ -656,11 +664,39 @@ function initCollapsibles() {
 // Event wiring — all inputs update _state then recalc
 // ─────────────────────────────────────────────────
 
+function setRhodoInfestedError(show, siteHa) {
+  const err = el('rhodo-infested-error');
+  const input = el('input-rhodo-infested');
+  if (err) {
+    err.hidden = !show;
+    err.textContent = show
+      ? `Infested area cannot exceed the site area (${Number(siteHa).toFixed(1)} ha).`
+      : 'Infested area cannot exceed the site area.';
+  }
+  if (input) {
+    if (show) input.setCustomValidity(`Infested area cannot exceed the site area (${Number(siteHa).toFixed(1)} ha).`);
+    else input.setCustomValidity('');
+  }
+}
+
+/** Cap infested ha at site ha; update max attribute and optional validation message. */
+function syncRhodoInfestedToSite({ announce = false } = {}) {
+  const siteHa = _state.hectares;
+  const input = el('input-rhodo-infested');
+  if (input) input.max = String(siteHa);
+  const capped = clampRhododendronInfestedHa(_state.rhododendron_infested_ha, siteHa);
+  const wasOver = _state.rhododendron_infested_ha > siteHa;
+  _state.rhododendron_infested_ha = capped;
+  if (input && Number(input.value) !== capped) input.value = capped;
+  setRhodoInfestedError(announce && wasOver, siteHa);
+}
+
 function initInputEvents() {
   // Site size slider
   el('input-size')?.addEventListener('input', () => {
     _state.hectares = parseFloat(el('input-size').value) || 4;
     el('input-size-num').value = _state.hectares;
+    syncRhodoInfestedToSite({ announce: true });
     runCalculation();
   });
 
@@ -671,6 +707,7 @@ function initInputEvents() {
       _state.hectares = v;
       el('input-size').value = v;
       el('input-size-num').setCustomValidity('');
+      syncRhodoInfestedToSite({ announce: true });
       runCalculation();
     } else {
       el('input-size-num').setCustomValidity('Enter a value between 0.5 and 20 hectares');
@@ -729,6 +766,26 @@ function initInputEvents() {
   el('input-grants')?.addEventListener('change', () => {
     _state.include_grants = el('input-grants').checked;
     runCalculation();
+  });
+
+  // Rhododendron infested area (ha) — grant = infested × method rate; capped at site ha
+  const dRhodo = debounce(runCalculation, 300);
+  el('input-rhodo-infested')?.addEventListener('input', () => {
+    const input = el('input-rhodo-infested');
+    const v = parseFloat(input.value);
+    const siteHa = _state.hectares;
+    if (isNaN(v) || v < 0) {
+      _state.rhododendron_infested_ha = 0;
+      setRhodoInfestedError(false, siteHa);
+    } else if (v > siteHa) {
+      _state.rhododendron_infested_ha = siteHa;
+      input.value = siteHa;
+      setRhodoInfestedError(true, siteHa);
+    } else {
+      _state.rhododendron_infested_ha = v;
+      setRhodoInfestedError(false, siteHa);
+    }
+    dRhodo();
   });
 
   // Agent/DIY toggle
@@ -815,7 +872,7 @@ function hideOverlay() {
 
 function registerServiceWorker() {
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/sw.js?v=12').catch(() => {});
+    navigator.serviceWorker.register('/sw.js?v=13').catch(() => {});
   }
 }
 
