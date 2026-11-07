@@ -51,7 +51,8 @@ export function timberRevenue(inputs, constants) {
  */
 export function fgsGrants(inputs, constants) {
   const { hectares, fencing_m, natural_regen_pct,
-          override_fencing_grant, override_restocking_grant } = inputs;
+          override_fencing_grant, override_restocking_grant,
+          override_rhododendron_grant } = inputs;
   const g = constants.fgs_grants;
   const c = constants.costs;
 
@@ -79,8 +80,9 @@ export function fgsGrants(inputs, constants) {
   const regenPart       = hectares * regenFraction  * regenRate;
   const restocking_grant = activePart + regenPart;
 
-  // Rhododendron / invasive clearance — always 100% of site
-  const rhododendron_grant = hectares * g.rhododendron_clearance_per_ha;
+  // Rhododendron / invasive clearance — whole site × rate until infested-area input lands
+  const rhodoRate = override_rhododendron_grant ?? g.rhododendron_clearance_per_ha;
+  const rhododendron_grant = hectares * rhodoRate;
 
   const total_fgs = fencing_grant + tree_protection_grant
                   + restocking_grant + rhododendron_grant;

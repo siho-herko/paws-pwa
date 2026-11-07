@@ -24,7 +24,7 @@
   <link rel="icon" href="icons/icon-192.svg" type="image/svg+xml">
 
   <!-- Styles -->
-  <link rel="stylesheet" href="styles/main.css?v=11">
+  <link rel="stylesheet" href="styles/main.css?v=12">
 </head>
 <body>
 
@@ -349,6 +349,14 @@
                   <input type="number" class="adv-override" id="adv-restocking-grant"
                          placeholder="550" min="0" max="6000" step="100">
                 </div>
+                <div class="advanced-field">
+                  <label for="adv-rhododendron-grant">Rhododendron clearance (£/ha)</label>
+                  <input type="number" class="adv-override" id="adv-rhododendron-grant"
+                         placeholder="0" min="0" max="10000" step="100">
+                  <p class="helper-text mt-8">
+                    Rhododendron grants are paid per hectare of infested land; until the calculator asks for infested area, enter a rate scaled to the infested share of the site.
+                  </p>
+                </div>
 
                 <div class="adv-section-label">Planting Costs</div>
                 <div class="advanced-field">
@@ -373,7 +381,7 @@
                   ↺ Reset to Scottish Forestry defaults
                 </button>
                 <p class="helper-text" style="margin-top:10px;">
-                  Defaults: Forestry Grant Scheme rates as at 3 November 2026 (Woodland Improvement Grant – Restructuring Regeneration £550/ha, published 1 October 2024; capital items from the October 2025 table). Override for site-specific estimates.
+                  Defaults: Forestry Grant Scheme rates as read on 7 November 2026 (see Sources and method). Override for site-specific estimates.
                 </p>
               </div>
             </div>
@@ -536,8 +544,40 @@
       <p style="font-size:0.75rem; color:var(--c-muted); line-height:1.6;">
         Indicative modelling only. Timber values and grant rates are subject to market conditions and eligibility.
         Consult a registered forestry consultant before committing to a PAWS restoration programme.
-        Grants are excluded unless you include them, and are conditional on eligibility and Scottish Forestry approval. Rates checked 3 November 2026 on ruralpayments.org: Woodland Improvement Grant – Restructuring Regeneration £300/£550 per ha (published 1 October 2024); Habitats and Species deer fence £9.50/m and rhododendron rates by method (page dated 5 July 2019). Timber is in m³ overbark standing; reference GB coniferous standing sales average £35.17/m³ overbark, year to March 2026 (Forest Research Timber Price Indices, 28 May 2026). Standing volume is a placeholder: use a site inventory. Sponsorship and the 15-year values are optional scenarios with no contracts; England's statutory Biodiversity Net Gain does not apply in Scotland. Last updated: 3 November 2026.
+        Grants are excluded unless you include them, and are conditional on eligibility and Scottish Forestry approval.
       </p>
+
+      <section id="sources-method" aria-labelledby="sources-method-title" style="font-size:0.75rem; color:var(--c-muted); line-height:1.6;">
+        <h2 id="sources-method-title" style="font-size:0.875rem; margin:16px 0 8px;">Sources and method</h2>
+        <p>Grant rates are set by Scottish Forestry and can change. Check current rates and eligibility with Scottish Forestry before relying on any grant.</p>
+        <ul style="padding-left:1.2em; margin:8px 0;">
+          <li>
+            <strong>Deer fencing and rhododendron control:</strong> Rural Payments and Services,
+            <a href="https://www.ruralpayments.org/topics/all-schemes/forestry-grant-scheme/woodland-improvement-grant/habitats-and-species/" target="_blank" rel="noopener">Woodland Improvement Grant – Habitats and Species</a>
+            (date published 5 July 2019; rates as read on 7 November 2026). Deer fence £9.50/m. Rhododendron eradication is paid per hectare of infested land, by method: manual £3,500, £5,500 or £7,300; mechanised £2,200, £3,400 or £5,600; stem injection £3,000 or £4,500; foliar spray £200; follow-up £200. The calculator uses £0/ha for rhododendron unless you enter a site rate. Gate – for Deer Fence £215/each is claimable but not modelled here; Gate – for Stock Fence £170/each may also be claimable (same page, rates as read on 7 November 2026).
+          </li>
+          <li>
+            <strong>Deer fence eligibility:</strong> Rural Payments and Services,
+            <a href="https://www.ruralpayments.org/topics/all-schemes/forestry-grant-scheme/forestry-grant-scheme-capital-items/deer-fence--fgs-/" target="_blank" rel="noopener">Deer Fence capital item</a>
+            (date published 22 July 2015). Claimable only under Woodland Creation or Habitats and Species, where Scottish Forestry agrees deer damage would otherwise prevent the objectives.
+          </li>
+          <li>
+            <strong>Restocking:</strong> Rural Payments and Services,
+            <a href="https://www.ruralpayments.org/topics/all-schemes/forestry-grant-scheme/woodland-improvement-grant/restructuring-regeneration/" target="_blank" rel="noopener">Woodland Improvement Grant – Restructuring Regeneration</a>
+            (date published 1 October 2024; rates as read on 7 November 2026). £300/ha or £550/ha, depending on the species mix in the approved forest plan or Felling Permission.
+          </li>
+          <li>
+            The Woodland Creation rates (date published 6 October 2025) are for new woodland. The calculator does not use them.
+          </li>
+          <li>
+            <strong>Timber:</strong> in m³ overbark standing. Reference price is the GB coniferous standing sales average of £35.17/m³ overbark, year to March 2026 (Forest Research Timber Price Indices, 28 May 2026). Standing volume is a placeholder: use a site inventory.
+          </li>
+          <li>
+            <strong>Method:</strong> grants are added only when you include conditional grants. Sponsorship and the 15-year values are optional scenarios with no contracts. England's statutory Biodiversity Net Gain does not apply in Scotland.
+          </li>
+        </ul>
+        <p>Last updated: 7 November 2026.</p>
+      </section>
 
     </main>
   </div><!-- /app-wrapper -->
@@ -559,7 +599,7 @@
 
     <div class="footer-details">
       <p class="footer-disclaimer">
-        Indicative estimates for discussion, based on the sources listed below. Not financial, legal or agronomic advice. Check figures with a qualified adviser before making decisions.
+        Indicative estimates for discussion, based on the sources set out under Sources and method. Not financial, legal or agronomic advice. Check figures with a qualified adviser before making decisions.
       </p>
 
       <div class="footer-funders">
@@ -608,7 +648,7 @@
        SCRIPTS
   ═══════════════════════════════════════════ -->
   <!-- ES modules — order handled by import statements in app.js -->
-  <script type="module" src="app.js?v=11"></script>
+  <script type="module" src="app.js?v=12"></script>
 
 </body>
 </html>

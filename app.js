@@ -10,7 +10,7 @@
  *   runCalculation() — patches constants, calculates, renders, encodes URL
  */
 
-import { dbReady, getConstants, resetConstants, reseedInfo } from './db.js?v=11';
+import { dbReady, getConstants, resetConstants, reseedInfo } from './db.js?v=12';
 import {
   calculate,
   suggestPerimeter,
@@ -18,8 +18,8 @@ import {
   difficultyClass,
   speciesLabel,
   speciesIcon,
-} from './calc.js?v=11';
-import { donutChart, lineChart, CHART_COLORS } from './charts.js?v=11';
+} from './calc.js?v=12';
+import { donutChart, lineChart, CHART_COLORS } from './charts.js?v=12';
 
 // ─────────────────────────────────────────────────
 // Application state — single source of truth
@@ -40,6 +40,7 @@ const _state = {
   adv_yield:              null,  // → inputs.override_yield
   adv_fencing_grant:      null,  // → inputs.override_fencing_grant
   adv_restocking_grant:   null,  // → inputs.override_restocking_grant
+  adv_rhododendron_grant: null,  // → inputs.override_rhododendron_grant
   adv_sitka_price:        null,  // patches constants
   adv_scots_price:        null,  // patches constants (Scots Pine + Larch)
   adv_trees_per_ha:       null,  // patches constants
@@ -124,6 +125,7 @@ function buildInputs(state) {
     override_yield:             state.adv_yield,
     override_fencing_grant:     state.adv_fencing_grant,
     override_restocking_grant:  state.adv_restocking_grant,
+    override_rhododendron_grant: state.adv_rhododendron_grant,
   };
 }
 
@@ -147,6 +149,7 @@ function encodeURL(state) {
   enc('yield', state.adv_yield);
   enc('fg',    state.adv_fencing_grant);
   enc('rg',    state.adv_restocking_grant);
+  enc('rh',    state.adv_rhododendron_grant);
   enc('sitka', state.adv_sitka_price);
   enc('scots', state.adv_scots_price);
   enc('tph',   state.adv_trees_per_ha);
@@ -183,6 +186,7 @@ function decodeURL() {
     adv_yield:              pN('yield'),
     adv_fencing_grant:      pN('fg'),
     adv_restocking_grant:   pN('rg'),
+    adv_rhododendron_grant: pN('rh'),
     adv_sitka_price:        pN('sitka'),
     adv_scots_price:        pN('scots'),
     adv_trees_per_ha:       pN('tph'),
@@ -223,6 +227,7 @@ function applyStateToDOM(s) {
   setIfSet('adv-yield',           s.adv_yield);
   setIfSet('adv-fencing-grant',   s.adv_fencing_grant);
   setIfSet('adv-restocking-grant', s.adv_restocking_grant);
+  setIfSet('adv-rhododendron-grant', s.adv_rhododendron_grant);
   setIfSet('adv-sitka-price',     s.adv_sitka_price);
   setIfSet('adv-scots-price',     s.adv_scots_price);
   setIfSet('adv-trees-per-ha',    s.adv_trees_per_ha);
@@ -241,6 +246,7 @@ function populateAdvancedFields(c) {
   set('adv-scots-price',       c.timber?.species?.scots_pine?.price_per_m3_ob ?? c.timber?.species?.scots_pine?.price_per_ton);
   set('adv-fencing-grant',     c.fgs_grants?.deer_fencing_grant_per_m);
   set('adv-restocking-grant',  c.fgs_grants?.restocking_grant_per_ha);
+  set('adv-rhododendron-grant', c.fgs_grants?.rhododendron_clearance_per_ha);
   set('adv-trees-per-ha',      c.costs?.trees_per_ha);
   set('adv-tree-cost',         c.costs?.tree_cost_each);
   set('adv-agent-fee',         (c.costs?.agent_fee_pct ?? 0.12) * 100);
@@ -737,6 +743,7 @@ function initInputEvents() {
     ['adv-yield',             'adv_yield'],
     ['adv-fencing-grant',     'adv_fencing_grant'],
     ['adv-restocking-grant',  'adv_restocking_grant'],
+    ['adv-rhododendron-grant','adv_rhododendron_grant'],
     ['adv-sitka-price',       'adv_sitka_price'],
     ['adv-scots-price',       'adv_scots_price'],
     ['adv-trees-per-ha',      'adv_trees_per_ha'],
@@ -759,6 +766,7 @@ function initInputEvents() {
     // Clear all advanced overrides in state
     Object.assign(_state, {
       adv_yield: null, adv_fencing_grant: null, adv_restocking_grant: null,
+      adv_rhododendron_grant: null,
       adv_sitka_price: null, adv_scots_price: null,
       adv_trees_per_ha: null, adv_tree_cost: null, adv_agent_fee_pct: null,
     });
@@ -807,7 +815,7 @@ function hideOverlay() {
 
 function registerServiceWorker() {
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/sw.js?v=11').catch(() => {});
+    navigator.serviceWorker.register('/sw.js?v=12').catch(() => {});
   }
 }
 
