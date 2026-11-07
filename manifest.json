@@ -1,7 +1,7 @@
 {
   "name": "PAWS Business Case Modeller",
   "short_name": "PAWS Modeller",
-  "description": "Model the financial case for ancient woodland restoration in Fife. NFCA.",
+  "description": "Model the financial case for ancient woodland restoration in Fife.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#faf7f0",

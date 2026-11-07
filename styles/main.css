@@ -1,6 +1,5 @@
 /* ============================================================
    PAWS Business Case Modeller — Design System
-   NFCA visual identity, matching fife-shieldbelt.netlify.app
    ============================================================ */
 
 /* ── Google Fonts ── */
@@ -80,19 +79,6 @@ h1, h2, h3, h4 {
   align-items: center;
   gap: 12px;
   text-decoration: none;
-}
-
-.header-logo {
-  height: 38px;
-  width: auto;
-}
-
-.header-logo-fallback {
-  font-family: 'Playfair Display', serif;
-  font-weight: 900;
-  font-size: 1.1rem;
-  color: var(--c-gold-lt);
-  letter-spacing: .04em;
 }
 
 .header-title {
