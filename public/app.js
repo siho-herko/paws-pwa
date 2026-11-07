@@ -834,6 +834,24 @@ function showRatesUpdatedNotice(info) {
   header.insertAdjacentElement('afterend', box);
 }
 
+function showLoadError() {
+  const header = document.querySelector('.site-header');
+  if (!header || document.getElementById('load-error-notice')) return;
+  const box = document.createElement('div');
+  box.id = 'load-error-notice';
+  box.setAttribute('role', 'alert');
+  box.style.cssText = 'margin:0.75rem auto;max-width:60rem;padding:0.75rem 1rem;border:1px solid currentColor;border-radius:6px;display:flex;gap:1rem;align-items:flex-start;justify-content:space-between;';
+  const msg = document.createElement('p');
+  msg.style.margin = '0';
+  msg.textContent = 'The grant and timber rates could not be loaded, so no results are shown. Check your connection and reload the page.';
+  const btn = document.createElement('button');
+  btn.type = 'button';
+  btn.textContent = 'Reload';
+  btn.addEventListener('click', () => location.reload());
+  box.append(msg, btn);
+  header.insertAdjacentElement('afterend', box);
+}
+
 // ─────────────────────────────────────────────────
 // Boot
 // ─────────────────────────────────────────────────
@@ -845,6 +863,7 @@ function init() {
   _initAsync().catch(err => {
     console.error('PAWS init error:', err);
     hideOverlay();
+    showLoadError();
   });
 }
 

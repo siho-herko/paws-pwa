@@ -1,9 +1,10 @@
 /**
  * sw.js — Woodland Restoration Calculator service worker
- * Cache-first strategy for all static assets.
+ * Pages are network-first so a deploy reaches returning users; static assets
+ * are cache-first and refreshed by bumping CACHE_NAME.
  */
 
-const CACHE_NAME  = 'paws-modeller-v8';
+const CACHE_NAME  = 'paws-modeller-v9';
 
 const PRECACHE_URLS = [
   '/',
@@ -12,11 +13,15 @@ const PRECACHE_URLS = [
   '/calc.js',
   '/charts.js',
   '/db.js',
-  '/styles/main.css?v=8',
+  '/styles/main.css?v=9',
   '/data/paws_constants.json',
   '/manifest.json',
   '/icons/icon-192.svg',
   '/icons/icon-512.svg',
+  '/icons/icon-192.png',
+  '/icons/icon-512.png',
+  '/icons/icon-maskable-512.png',
+  '/icons/apple-touch-icon.png',
   '/images/funders/heritage-fund-stamp-gd-en.png',
   '/images/funders/scotgov-naturescot-lockup.png',
 ];
@@ -52,6 +57,21 @@ self.addEventListener('fetch', event => {
   if (event.request.method !== 'GET') return;
 
   const url = new URL(event.request.url);
+
+  if (event.request.mode === 'navigate' && url.origin === self.location.origin) {
+    event.respondWith(
+      fetch(event.request)
+        .then(response => {
+          if (response.ok) {
+            const clone = response.clone();
+            caches.open(CACHE_NAME).then(cache => cache.put('/', clone));
+          }
+          return response;
+        })
+        .catch(() => caches.match('/'))
+    );
+    return;
+  }
 
   if (url.origin === self.location.origin && url.pathname.startsWith('/data/')) {
     event.respondWith(

@@ -35,3 +35,11 @@
 /manifest.json
   ! Cache-Control
   Cache-Control: no-cache
+
+/
+  ! Cache-Control
+  Cache-Control: no-cache
+
+/index.html
+  ! Cache-Control
+  Cache-Control: no-cache
