@@ -10,7 +10,7 @@
  *   runCalculation() — patches constants, calculates, renders, encodes URL
  */
 
-import { dbReady, getConstants, resetConstants, reseedInfo } from './db.js?v=10';
+import { dbReady, getConstants, resetConstants, reseedInfo } from './db.js?v=11';
 import {
   calculate,
   suggestPerimeter,
@@ -18,8 +18,8 @@ import {
   difficultyClass,
   speciesLabel,
   speciesIcon,
-} from './calc.js?v=10';
-import { donutChart, lineChart, CHART_COLORS } from './charts.js?v=10';
+} from './calc.js?v=11';
+import { donutChart, lineChart, CHART_COLORS } from './charts.js?v=11';
 
 // ─────────────────────────────────────────────────
 // Application state — single source of truth
@@ -512,7 +512,7 @@ function renderSweatEquity(r) {
         <div class="compare-bar-item">
           <span class="compare-bar-name">DIY</span>
           <div class="compare-bar-track">
-            <div class="compare-bar-fill" style="width:${pct(dVal)}%;background:${CHART_COLORS.diy};">
+            <div class="compare-bar-fill" style="width:${pct(dVal)}%;background:${CHART_COLORS.diy};color:var(--c-ink);">
               ${dVal > 800 ? fmt(dVal) : ''}
             </div>
           </div>
@@ -588,7 +588,7 @@ function renderProjection(r) {
       </div>
       <div class="stat-box">
         <div class="stat-box-label">First income year</div>
-        <div class="stat-box-value" style="color:var(--c-gold);font-size:1rem;">Year 4</div>
+        <div class="stat-box-value" style="color:var(--c-gold-text);font-size:1rem;">Year 4</div>
       </div>
     </div>`;
 }
@@ -807,7 +807,7 @@ function hideOverlay() {
 
 function registerServiceWorker() {
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/sw.js?v=10').catch(() => {});
+    navigator.serviceWorker.register('/sw.js?v=11').catch(() => {});
   }
 }
 
@@ -904,6 +904,13 @@ async function _initAsync() {
   Object.entries(ariaMap).forEach(([id, label]) => {
     const c = el(id);
     if (c) { c.setAttribute('role', 'img'); c.setAttribute('aria-label', label); }
+  });
+  const describedBy = {
+    'chart-donut':      'funding-rows',
+    'chart-projection': 'projection-stats',
+  };
+  Object.entries(describedBy).forEach(([id, textId]) => {
+    el(id)?.setAttribute('aria-describedby', textId);
   });
 }
 

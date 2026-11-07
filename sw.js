@@ -4,16 +4,16 @@
  * are cache-first and refreshed by bumping CACHE_NAME.
  */
 
-const CACHE_NAME  = 'paws-modeller-v10';
+const CACHE_NAME  = 'paws-modeller-v11';
 
 const PRECACHE_URLS = [
   '/',
   '/index.html',
-  '/app.js?v=10',
-  '/calc.js?v=10',
-  '/charts.js?v=10',
-  '/db.js?v=10',
-  '/styles/main.css?v=10',
+  '/app.js?v=11',
+  '/calc.js?v=11',
+  '/charts.js?v=11',
+  '/db.js?v=11',
+  '/styles/main.css?v=11',
   '/data/paws_constants.json',
   '/manifest.json',
   '/icons/icon-192.svg',

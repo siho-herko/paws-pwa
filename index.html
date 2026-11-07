@@ -24,7 +24,7 @@
   <link rel="icon" href="icons/icon-192.svg" type="image/svg+xml">
 
   <!-- Styles -->
-  <link rel="stylesheet" href="styles/main.css?v=10">
+  <link rel="stylesheet" href="styles/main.css?v=11">
 </head>
 <body>
 
@@ -116,8 +116,8 @@
             </div>
 
             <div class="mt-12">
-              <label class="select-label" for="input-species">Conifer species</label>
-              <select id="input-species" aria-label="Select conifer species">
+              <label class="select-label" for="input-species">Current conifer crop</label>
+              <select id="input-species" aria-label="Select current conifer crop">
                 <option value="sitka_spruce">Sitka Spruce</option>
                 <option value="scots_pine">Scots Pine</option>
                 <option value="larch">Larch</option>
@@ -194,8 +194,11 @@
               </div>
             </div>
             <div class="auto-calc-text" id="perimeter-suggest">
-              Suggested: ≈ <span id="perimeter-auto">—</span> m &nbsp;(√(ha × 10,000) × 4 × 1.2)
+              Suggested: ≈ <span id="perimeter-auto">—</span> m
             </div>
+            <p class="helper-text mt-4">
+              Estimated from the site area: the perimeter of a square of the same area, multiplied by 1.2 (√(ha × 10,000) × 4 × 1.2).
+            </p>
 
             <label class="checkbox-row mt-8" for="input-no-fence">
               <input type="checkbox" id="input-no-fence" aria-label="No deer pressure — fencing not needed">
@@ -388,7 +391,7 @@
 
       <div class="results-header">
         <h2>Your Financial Case</h2>
-        <p>Adjust the controls on the left to model your specific PAWS site.</p>
+        <p>Adjust the controls on the left to model your specific PAWS site (<a href="https://www.forestresearch.gov.uk/research/lowland-native-woodlands/restoration-of-lowland-plantations-on-ancient-woodland-sites-paws/" target="_blank" rel="noopener noreferrer">Plantation on Ancient Woodland Site</a>).</p>
       </div>
 
       <!-- Sister tool contextual nudge — hectares value updated by app.js -->
@@ -605,7 +608,7 @@
        SCRIPTS
   ═══════════════════════════════════════════ -->
   <!-- ES modules — order handled by import statements in app.js -->
-  <script type="module" src="app.js?v=10"></script>
+  <script type="module" src="app.js?v=11"></script>
 
 </body>
 </html>
