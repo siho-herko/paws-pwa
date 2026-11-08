@@ -4,16 +4,16 @@
  * are cache-first and refreshed by bumping CACHE_NAME.
  */
 
-const CACHE_NAME  = 'paws-modeller-v13';
+const CACHE_NAME  = 'paws-modeller-v14';
 
 const PRECACHE_URLS = [
   '/',
   '/index.html',
-  '/app.js?v=13',
-  '/calc.js?v=13',
-  '/charts.js?v=13',
-  '/db.js?v=13',
-  '/styles/main.css?v=13',
+  '/app.js?v=14',
+  '/calc.js?v=14',
+  '/charts.js?v=14',
+  '/db.js?v=14',
+  '/styles/main.css?v=14',
   '/data/paws_constants.json',
   '/manifest.json',
   '/icons/icon-192.svg',
@@ -24,6 +24,12 @@ const PRECACHE_URLS = [
   '/icons/apple-touch-icon.png',
   '/images/funders/heritage-fund-stamp-gd-en.png',
   '/images/funders/scotgov-naturescot-lockup.png',
+  '/fonts/source-sans-3-latin.woff2',
+  '/fonts/source-sans-3-latin-ext.woff2',
+  '/fonts/playfair-display-latin.woff2',
+  '/fonts/playfair-display-latin-ext.woff2',
+  '/fonts/jetbrains-mono-latin.woff2',
+  '/fonts/jetbrains-mono-latin-ext.woff2',
 ];
 
 // ── Install: pre-cache all static assets ──────────

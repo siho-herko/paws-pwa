@@ -23,8 +23,12 @@
   <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
   <link rel="icon" href="icons/icon-192.svg" type="image/svg+xml">
 
+  <!-- Critical self-hosted fonts (latin); latin-ext loads via CSS -->
+  <link rel="preload" href="/fonts/source-sans-3-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="/fonts/playfair-display-latin.woff2" as="font" type="font/woff2" crossorigin>
+
   <!-- Styles -->
-  <link rel="stylesheet" href="styles/main.css?v=13">
+  <link rel="stylesheet" href="styles/main.css?v=14">
 </head>
 <body>
 
@@ -666,7 +670,7 @@
        SCRIPTS
   ═══════════════════════════════════════════ -->
   <!-- ES modules — order handled by import statements in app.js -->
-  <script type="module" src="app.js?v=13"></script>
+  <script type="module" src="app.js?v=14"></script>
 
 </body>
 </html>
