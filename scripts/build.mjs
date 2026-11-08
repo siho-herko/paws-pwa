@@ -14,6 +14,7 @@ const appFiles = [
   'charts.js',
   'data',
   'db.js',
+  'fonts',
   'icons',
   'images',
   'index.html',

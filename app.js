@@ -10,7 +10,7 @@
  *   runCalculation() — patches constants, calculates, renders, encodes URL
  */
 
-import { dbReady, getConstants, resetConstants, reseedInfo } from './db.js?v=13';
+import { dbReady, getConstants, resetConstants, reseedInfo } from './db.js?v=14';
 import {
   calculate,
   clampRhododendronInfestedHa,
@@ -19,8 +19,8 @@ import {
   difficultyClass,
   speciesLabel,
   speciesIcon,
-} from './calc.js?v=13';
-import { donutChart, lineChart, CHART_COLORS } from './charts.js?v=13';
+} from './calc.js?v=14';
+import { donutChart, lineChart, CHART_COLORS } from './charts.js?v=14';
 
 // ─────────────────────────────────────────────────
 // Application state — single source of truth
@@ -872,7 +872,7 @@ function hideOverlay() {
 
 function registerServiceWorker() {
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/sw.js?v=13').catch(() => {});
+    navigator.serviceWorker.register('/sw.js?v=14').catch(() => {});
   }
 }
 
