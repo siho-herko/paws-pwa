@@ -23,14 +23,14 @@ const appFiles = [
   'sw.js',
 ];
 
-// The edge ignores Cache-Control for scripts and styles, so their URLs carry
-// ?v=N; every N must match the service worker's CACHE_NAME version.
+// _headers caches scripts and styles as immutable for a year, so every local
+// reference to them must carry ?v=N, and N must match CACHE_NAME's version.
 const sw = await readFile(path.join(root, 'sw.js'), 'utf8');
 const cacheVersion = sw.match(/CACHE_NAME\s*=\s*'paws-modeller-v(\d+)'/)?.[1];
 for (const file of ['index.html', 'app.js', 'sw.js']) {
   const text = await readFile(path.join(root, file), 'utf8');
-  for (const [, v] of text.matchAll(/\.(?:js|css)\?v=(\d+)/g)) {
-    if (v !== cacheVersion) throw new Error(`${file}: asset ?v=${v} does not match CACHE_NAME v${cacheVersion}`);
+  for (const [, ref, v] of text.matchAll(/["'](?:\.?\/)?((?:styles\/)?[\w-]+\.(?:js|css))(?:\?v=(\d+))?["']/g)) {
+    if (v !== cacheVersion) throw new Error(`${file}: ${ref} must use ?v=${cacheVersion}, found ${v ? `?v=${v}` : 'no version'}`);
   }
 }
 
