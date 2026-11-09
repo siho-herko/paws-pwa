@@ -10,7 +10,7 @@
  *   runCalculation() — patches constants, calculates, renders, encodes URL
  */
 
-import { dbReady, getConstants, resetConstants, reseedInfo } from './db.js?v=14';
+import { dbReady, getConstants, resetConstants, reseedInfo } from './db.js?v=15';
 import {
   calculate,
   clampRhododendronInfestedHa,
@@ -19,8 +19,9 @@ import {
   difficultyClass,
   speciesLabel,
   speciesIcon,
-} from './calc.js?v=14';
-import { donutChart, lineChart, CHART_COLORS } from './charts.js?v=14';
+} from './calc.js?v=15';
+import { donutChart, lineChart, CHART_COLORS } from './charts.js?v=15';
+import { isRetiredPagesHost, buildRetiredRedirectUrl } from './retire-host.js?v=15';
 
 // ─────────────────────────────────────────────────
 // Application state — single source of truth
@@ -871,8 +872,12 @@ function hideOverlay() {
 // ─────────────────────────────────────────────────
 
 function registerServiceWorker() {
+  if (isRetiredPagesHost(location.hostname)) {
+    location.replace(buildRetiredRedirectUrl(location.pathname, location.search, location.hash));
+    return;
+  }
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/sw.js?v=14').catch(() => {});
+    navigator.serviceWorker.register('/sw.js?v=15').catch(() => {});
   }
 }
 

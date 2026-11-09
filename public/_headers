@@ -32,6 +32,10 @@
   ! Cache-Control
   Cache-Control: no-cache
 
+/retire-host.js
+  ! Cache-Control
+  Cache-Control: no-cache
+
 /styles/*
   ! Cache-Control
   Cache-Control: no-cache
