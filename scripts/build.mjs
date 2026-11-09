@@ -19,6 +19,7 @@ const appFiles = [
   'images',
   'index.html',
   'manifest.json',
+  'retire-host.js',
   'styles',
   'sw.js',
 ];

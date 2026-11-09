@@ -4,7 +4,8 @@
   "type": "module",
   "scripts": {
     "build": "node scripts/build.mjs",
-    "test": "node tests/calc.test.js",
-    "test:calc": "node tests/calc.test.js"
+    "test": "node tests/calc.test.js && node tests/retire-host.test.js && node tests/retire-sw-cleanup.test.js",
+    "test:calc": "node tests/calc.test.js",
+    "test:retire": "node tests/retire-host.test.js && node tests/retire-sw-cleanup.test.js"
   }
 }
