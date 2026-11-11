@@ -1,0 +1,4 @@
+# Retire legacy Cloudflare Pages host (MM-12).
+# Copied into public/ by scripts/build.mjs (pages_build_output_dir).
+# Keep the Pages project; do not delete it.
+/*  https://woodland-restoration.trigrammatic.com/:splat  301
