@@ -9,7 +9,6 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const output = path.join(root, 'public');
 const appFiles = [
   '_headers',
-  '_redirects',
   'app.js',
   'calc.js',
   'charts.js',
